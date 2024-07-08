@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE jboss-web PUBLIC "-//JBoss//DTD Web Application 5.0//EN" "http://www.jboss.org/j2ee/dtd/jboss-web_5_0.dtd">
+<jboss-web>
+    <security-domain>cts</security-domain>
+    <resource-env-ref>
+        <resource-env-ref-name>jms/MY_TOPIC</resource-env-ref-name>
+        <jndi-name>java:/MY_TOPIC</jndi-name>
+    </resource-env-ref>
+    <resource-ref>
+        <res-ref-name>jms/MyTopicConnectionFactory</res-ref-name>
+        <jndi-name>java:/jms/TopicConnectionFactory</jndi-name>
+    </resource-ref>
+</jboss-web>

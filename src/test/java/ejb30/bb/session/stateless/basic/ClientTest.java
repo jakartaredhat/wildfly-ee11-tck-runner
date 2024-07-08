@@ -35,7 +35,7 @@ public class ClientTest extends Client {
                 com.sun.ts.tests.ejb30.common.helper.TLogger.class,
                 com.sun.ts.tests.ejb30.common.calc.RemoteCalculator.class
         );
-        URL resURL = ClientTest.class.getResource("/ejb30/bb/session/stateless/basic/ejb3_bb_stateless_basic_ejb.xml");
+        URL resURL = Client.class.getResource("/com/sun/ts/tests/ejb30/bb/session/stateless/basic/ejb3_bb_stateless_basic_ejb.xml");
         ejb3_bb_stateless_basic_ejb.addAsManifestResource(resURL, "ejb-jar.xml");
         resURL = ClientTest.class.getResource("/ejb30/bb/session/stateless/basic/ejb3_bb_stateless_basic_ejb.jar.sun-ejb-jar.xml");
         ejb3_bb_stateless_basic_ejb.addAsManifestResource(resURL, "sun-ejb-jar.xml");

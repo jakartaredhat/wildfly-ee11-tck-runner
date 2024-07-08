@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><jboss:jboss xmlns:jboss="http://www.jboss.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss_5_0.xsd http://java.sun.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss-ejb3-spec-2_0.xsd urn:security jboss-ejb-security_1_0.xsd urn:security-role jboss-ejb-security-role_1_0.xsd" version="3.1" impl-version="2.0">
+    <jboss:enterprise-beans>
+        <jboss:ejb>
+            <ejb-name xmlns="http://java.sun.com/xml/ns/javaee">com_sun_ts_tests_common_vehicle_ejb_EJBVehicle</ejb-name>
+            <activation-config xmlns="http://java.sun.com/xml/ns/javaee">
+                <activation-config-property>
+                    <activation-config-property-name>destination</activation-config-property-name>
+                    <activation-config-property-value>java:/bytesMsgTopic_ejb_vehicle</activation-config-property-value>
+                </activation-config-property>
+            </activation-config>
+            <resource-ref xmlns="http://java.sun.com/xml/ns/javaee">
+                <res-ref-name>jms/MyTopicConnectionFactory</res-ref-name>
+                <lookup-name>java:/jms/TopicConnectionFactory</lookup-name>
+            </resource-ref>
+            <resource-env-ref xmlns="http://java.sun.com/xml/ns/javaee">
+                <resource-env-ref-name>jms/MY_TOPIC</resource-env-ref-name>
+                <lookup-name>java:/MY_TOPIC</lookup-name>
+            </resource-env-ref>
+        </jboss:ejb>
+    </jboss:enterprise-beans>
+    <assembly-descriptor xmlns="http://java.sun.com/xml/ns/javaee">
+        <iiop xmlns:xalan="http://xml.apache.org/xalan" xmlns:sr="urn:security-role" xmlns:s="urn:security:1.1" xmlns:ext="xalan://org.jboss.ts.lib.porting.EjbJarHandler" xmlns="urn:iiop">
+            <ejb-name xmlns="http://java.sun.com/xml/ns/javaee">com_sun_ts_tests_common_vehicle_ejb_EJBVehicle</ejb-name>
+            <binding-name>bytesMsgTopic_ejb_vehicle</binding-name>
+            <ior-security-config>
+
+                <transport-config>
+
+                    <integrity>supported</integrity>
+
+                    <confidentiality>supported</confidentiality>
+
+                    <establish-trust-in-target>supported</establish-trust-in-target>
+
+                    <establish-trust-in-client>supported</establish-trust-in-client>
+
+                </transport-config>
+
+                <as-context>
+
+                    <auth-method>username_password</auth-method>
+
+                    <realm>default</realm>
+
+                    <required>false</required>
+
+                </as-context>
+
+                <sas-context>
+
+                    <caller-propagation>supported</caller-propagation>
+
+                </sas-context>
+
+            </ior-security-config>
+        </iiop>
+    </assembly-descriptor>
+</jboss:jboss>

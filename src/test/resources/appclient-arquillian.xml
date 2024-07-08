@@ -48,6 +48,12 @@
             <property name="serverConfig">${wildfly.standalone.config}</property>
             <property name="allowConnectingToRunningServer">false</property>
         </configuration>
+        <protocol type="appclient">
+            <property name="runClient">true</property>
+            <property name="clientCmdLineString">${jboss.home}/bin/appclient.sh;target/appclient/ejb3_bb_stateless_basic.ear#ejb3_bb_stateless_basic_client.jar;-p;/home/starksm/Dev/Jakarta/wildflytck/jakartaeetck/bin/xml/../../tmp/tstest.jte</property>
+            <property name="clientEnvString">MY_EN=my-env-stting;JAVA_OPTS=-Djboss.modules.system.pkgs=com.sun.ts.lib,com.sun.javatest;CLASSPATH=${project.build.directory}/appclient/javatest.jar:${project.build.directory}/appclient/libutil.jar:${project.build.directory}/appclient/libcommon.jar</property>
+            <property name="clientDir">${project.basedir}</property>
+        </protocol>
     </container>
 
 </arquillian>

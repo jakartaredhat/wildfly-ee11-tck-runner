@@ -1,0 +1,929 @@
+wildfly-configuration:
+  system-property:
+    eislogin.name:
+      value: cts1
+    eislogin.password:
+      value: cts1
+    j2eelogin.name:
+      value: j2ee
+    j2eelogin.password:
+      value: j2ee
+    javax.net.ssl.keyStore:
+      value: '../standalone/configuration/keystores/clientcert.jks'
+    javax.net.ssl.keyStorePassword:
+      value: changeit
+#    javax.net.ssl.trustStorePassword:
+#      value: 'rmi+ssl'
+    javax.net.ssl.trustStore:
+      value: '../standalone/configuration/keystores/tomcat.keystore'
+    log.file.location:
+      value: '../standalone/log'
+    org.jboss.metadata.parser.validate:
+      value: 'false'
+    provider.configuration.file:
+      value: '../standalone/configuration/security/ProviderConfiguration.xml'
+    roles.properties:
+      value: '../standalone/configuration/security/cts-roles.properties'
+    users.properties:
+      value: '../standalone/configuration/security/cts-users.properties'
+    vendor.jakarta.security.jacc.PolicyConfigurationFactory.provider:
+      value: 'org.wildfly.security.authz.jacc.ElytronPolicyConfigurationFactory'
+    vendor.jakarta.security.jacc.policy.provider:
+      value: 'org.wildfly.security.authz.jacc.JaccDelegatingPolicy'
+    iiop-openjdk.interop.sun:
+      value: 'on'
+    ri.log.file.location:
+      value: '@javaee.home.ri@/domains/domain1/logs'
+    remote.orb.host:
+      value: 'localhost'
+    remote.orb.port:
+      value: '8002'
+    webServerHost.2:
+      value: 'localhost'
+    webServerPort.2:
+      value: '8002'
+  subsystem:
+    deployment-scanner:
+      scanner:
+        default:
+          auto-deploy-zipped: false
+    ee:
+      global-modules:
+        - name: com.sun.ts
+          slot: main
+    ejb3:
+      default-singleton-bean-access-timeout: 300000
+      default-stateful-bean-access-timeout: 300000
+      default-security-domain: cts
+      application-security-domain:
+        cts:
+          security-domain: cts
+          enable-jacc: false
+        cts-jaspi:
+          security-domain: cts
+          enable-jacc: false
+        cts-client-cert:
+          security-domain: cts-client-cert
+          enable-jacc: false
+    elytron:
+      security-domain:
+        CtsSaslDomain:
+          default-realm: CtsSaslRealm
+          permission-mapper: default-permission-mapper
+          realms:
+            - realm: CtsSaslRealm
+              role-decoder: groups-to-roles
+            - realm: local
+              role-mapper: super-user-mapper
+        cts:
+          default-realm: CtsCommonRealm
+          permission-mapper: cts-permissions-mapper
+          realms:
+            - realm: CtsCommonRealm
+              role-decoder: groups-to-roles
+            - realm: cts-unauthenticated
+              role-mapper: cts-user-mapper
+            - realm: local
+              role-mapper: super-user-mapper
+        other:
+          default-realm: CtsCommonRealm
+          permission-mapper: cts-permissions-mapper
+          realms:
+            - realm: CtsCommonRealm
+              role-decoder: groups-to-roles
+            - realm: cts-unauthenticated
+              role-mapper: cts-user-mapper
+        messaging:
+          default-realm: CtsCommonRealm
+          permission-mapper: cts-permissions-mapper
+          realms:
+            - realm: CtsCommonRealm
+              role-decoder: groups-to-roles
+            - realm: cts-unauthenticated
+              role-mapper: cts-user-mapper
+        cts-client-cert:
+          default-realm: CtsClientCertRealm
+          permission-mapper: cts-permissions-mapper
+          principal-decoder: x509
+          pre-realm-principal-transformer: spacer
+          realms:
+            - realm: CtsClientCertRealm
+              role-decoder: groups-to-roles
+      aggregate-realm:
+        CtsClientCertRealm:
+          authentication-realm: CtsClientKeyStoreRealm
+          authorization-realm: CtsCommonRealm
+      identity-realm:
+        cts-unauthenticated:
+          identity: cts-user
+      key-store-realm:
+        CtsClientKeyStoreRealm:
+         key-store: cts-truststore
+      properties-realm:
+        CtsSaslRealm:
+          users-properties:
+            path: './security/cts-users.properties'
+            relative-to: 'jboss.server.config.dir'
+            digest-realm-name: 'CtsSaslRealm'
+            plain-text: true
+          groups-properties:
+            path: './security/cts-roles.properties'
+            relative-to: 'jboss.server.config.dir'
+        CtsCommonRealm:
+          users-properties:
+            path: './security/cts-users.properties'
+            relative-to: 'jboss.server.config.dir'
+            digest-realm-name: 'CtsRealm'
+            plain-text: true
+          groups-properties:
+            path: './security/cts-roles.properties'
+            relative-to: 'jboss.server.config.dir'
+      constant-permission-mapper:
+        cts-permissions-mapper:
+          permissions:
+            - class-name: org.wildfly.security.auth.permission.LoginPermission
+            - class-name: 'org.wildfly.extension.batch.jberet.deployment.BatchPermission'
+              module: 'org.wildfly.extension.batch.jberet'
+              target-name: '*'
+            - class-name: org.wildfly.transaction.client.RemoteTransactionPermission
+              module: org.wildfly.transaction.client
+            - class-name: org.jboss.ejb.client.RemoteEJBPermission
+              module: org.jboss.ejb-client
+            - class-name: org.wildfly.security.auth.permission.RunAsPrincipalPermission
+              target-name: '*'
+      simple-regex-realm-mapper:
+        localRealmMapper:
+         pattern: '\$(local)'
+      constant-role-mapper:
+        cts-user-mapper:
+          roles:
+            - guest
+      x500-attribute-principal-decoder:
+        x509:
+          attribute-name: 'UID'
+      regex-principal-transformer:
+        spacer:
+          pattern: ','
+          replacement: ', '
+          replace-all: true
+      http-authentication-factory:
+        cts-http-authentication:
+          http-server-mechanism-factory: global
+          security-domain: cts
+          mechanism-configurations:
+            - mechanism-name: BASIC
+              mechanism-realm-configurations:
+              - realm-name: 'Application Realm'
+            - mechanism-name: FORM
+        cts-http-client-cert-authentication:
+          http-server-mechanism-factory: global
+          security-domain: cts-client-cert
+          mechanism-configurations:
+            - mechanism-name: CLIENT_CERT
+            - mechanism-name: BASIC
+              mechanism-realm-configurations:
+              - realm-name: 'Application Realm'
+            - mechanism-name: FORM
+      sasl-authentication-factory:
+        cts-sasl-authentication:
+         sasl-server-factory: configured
+         security-domain: cts
+         mechanism-configurations:
+            - mechanism-name: JBOSS-LOCAL-USER
+              realm-mapper: localRealmMapper
+            - mechanism-name: DIGEST-MD5
+              mechanism-realm-configurations:
+              - realm-name: CtsSaslRealm
+      key-store:
+        cts-keystore:
+          type: JKS
+          path: '/keystores/clientcert.jks'
+          relative-to: jboss.server.config.dir
+          credential-reference:
+            clear-text: changeit
+        cts-truststore:
+          type: JKS
+          path: '/keystores/tomcat.keystore'
+          relative-to: jboss.server.config.dir
+          credential-reference:
+            clear-text: 'rmi+ssl'
+      key-manager:
+        cts-https-key-manager:
+          algorithm: SunX509
+          key-store: cts-keystore
+          credential-reference:
+            clear-text: changeit
+        cts-https-trust-key-manager:
+          algorithm: SunX509
+          key-store: cts-truststore
+          credential-reference:
+            clear-text: 'rmi+ssl'
+      trust-manager:
+        cts-trust-manager:
+          algorithm: SunX509
+          key-store: cts-truststore
+      server-ssl-context:
+        cts-https-ssl-context:
+          protocols:
+            - TLSv1.2
+          want-client-auth: true
+          key-manager: cts-https-key-manager
+          trust-manager: cts-trust-manager
+        cts-iiop-server-ssl-context:
+          protocols:
+            - TLSv1.2
+          want-client-auth: true
+          key-manager: cts-https-key-manager
+          trust-manager: cts-trust-manager
+      client-ssl-context:
+        cts-iiop-client-ssl-context:
+          protocols:
+            - TLSv1.2
+          key-manager: cts-https-key-manager
+          trust-manager: cts-trust-manager
+    iiop-openjdk:
+      ssl-socket-binding: iiop-ssl
+      server-ssl-context: cts-iiop-server-ssl-context
+      client-ssl-context: cts-iiop-client-ssl-context
+      support-ssl: true
+      server-requires-ssl: !undefine
+      client-requires-ssl: !undefine
+    mail:
+      mail-session:
+        cts:
+          jndi-name: java:/mail/Session
+          from: 'nobody@localhost'
+          server:
+            smtp:
+              outbound-socket-binding-ref: mail-smtp
+              username: nobody
+              password: password
+            pop3:
+              outbound-socket-binding-ref: mail-pop3
+              username: nobody
+              password: password
+            imap:
+              outbound-socket-binding-ref: mail-imap
+              username: nobody
+              password: password
+    messaging-activemq:
+      server:
+        default:
+          elytron-domain: messaging
+          security-setting:
+            '#':
+              role:
+                guest:
+                  create-durable-queue: true
+                  delete-durable-queue: true
+                  manage: true
+          connection-factory:
+            MDBTACCESSTEST_FACTORY:
+              entries:
+                - jms/MDBTACCESSTEST_FACTORY
+              connectors:
+                - http-connector
+              consumer-window-size: 0
+              client-id: cts1
+            DURABLE_BMT_CONNECTION_FACTORY:
+              entries:
+                - jms/DURABLE_BMT_CONNECTION_FACTORY
+              connectors:
+                - http-connector
+              consumer-window-size: 0
+              client-id: cts2
+            DURABLE_CMT_CONNECTION_FACTORY:
+              entries:
+                - jms/DURABLE_CMT_CONNECTION_FACTORY
+              connectors:
+                - http-connector
+              consumer-window-size: 0
+              client-id: cts3
+            DURABLE_BMT_XCONNECTION_FACTORY:
+              entries:
+                - jms/DURABLE_BMT_XCONNECTION_FACTORY
+              connectors:
+                - http-connector
+              consumer-window-size: 0
+              client-id: cts4
+            DURABLE_CMT_XCONNECTION_FACTORY:
+              entries:
+                - jms/DURABLE_CMT_XCONNECTION_FACTORY
+              connectors:
+                - http-connector
+              consumer-window-size: 0
+              client-id: cts5
+            DURABLE_CMT_TXNS_XCONNECTION_FACTORY:
+              entries:
+                - jms/DURABLE_CMT_TXNS_XCONNECTION_FACTORY
+              connectors:
+                - http-connector
+              consumer-window-size: 0
+              client-id: cts6
+          pooled-connection-factory:
+            activemq-ra:
+              entries:
+                - java:/JmsXA
+                - java:jboss/DefaultJMSConnectionFactory
+                - jms/ConnectionFactory
+              client-id: cts7
+            DURABLE_SUB_CONNECTION_FACTORY:
+              entries:
+                - jms/DURABLE_SUB_CONNECTION_FACTORY
+              connectors:
+                - http-connector
+              consumer-window-size: 0
+              client-id: cts
+              transaction: xa
+            activemq-ra2:
+              entries:
+                - jms/QueueConnectionFactory
+                - jms/TopicConnectionFactory
+              connectors:
+                - in-vm
+              transaction: xa
+            jmsra:
+              entries:
+                - jms/QueueConnectionFactory2
+                - jms/TopicConnectionFactory2
+              connectors:
+                - in-vm
+              transaction: xa
+          jms-queue:
+            testQueue:
+              entries:
+                - queue/test
+            MDB_QUEUE:
+              entries:
+                - MDB_QUEUE
+            MDB_QUEUE_REPLY:
+              entries:
+                - MDB_QUEUE_REPLY
+            myQueue:
+              entries:
+                - myQueue
+            MY_QUEUE:
+              entries:
+                - MY_QUEUE
+            MY_QUEUE2:
+              entries:
+                - MY_QUEUE2
+            Q2:
+              entries:
+                - Q2
+            QUEUE_BMT:
+              entries:
+                - QUEUE_BMT
+            ejb_ee_bb_localaccess_mdbqaccesstest_MDB_QUEUE:
+              entries:
+                - ejb_ee_bb_localaccess_mdbqaccesstest_MDB_QUEUE
+            ejb_ee_deploy_mdb_ejblink_casesensT_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_ejblink_casesensT_ReplyQueue
+            ejb_ee_deploy_mdb_ejblink_casesens_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_ejblink_casesens_ReplyQueue
+            ejb_ee_deploy_mdb_ejblink_casesens_TestBean:
+              entries:
+                - ejb_ee_deploy_mdb_ejblink_casesens_TestBean
+            ejb_ee_deploy_mdb_ejblink_scopeT_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_ejblink_scopeT_ReplyQueue
+            ejb_ee_deploy_mdb_ejblink_scope_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_ejblink_scope_ReplyQueue
+            ejb_ee_deploy_mdb_ejblink_scope_TestBean:
+              entries:
+                - ejb_ee_deploy_mdb_ejblink_scope_TestBean
+            ejb_ee_deploy_mdb_ejblink_singleT_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_ejblink_singleT_ReplyQueue
+            ejb_ee_deploy_mdb_ejblink_single_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_ejblink_single_ReplyQueue
+            ejb_ee_deploy_mdb_ejblink_single_TestBean:
+              entries:
+                - ejb_ee_deploy_mdb_ejblink_single_TestBean
+            ejb_ee_deploy_mdb_ejblink_single_TestBeanBMT:
+              entries:
+                - ejb_ee_deploy_mdb_ejblink_single_TestBeanBMT
+            ejb_ee_deploy_mdb_ejbref_casesensT_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_ejbref_casesensT_ReplyQueue
+            ejb_ee_deploy_mdb_ejbref_casesens_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_ejbref_casesens_ReplyQueue
+            ejb_ee_deploy_mdb_ejbref_casesens_TestBean:
+              entries:
+                - ejb_ee_deploy_mdb_ejbref_casesens_TestBean
+            ejb_ee_deploy_mdb_ejbref_scopeT_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_ejbref_scopeT_ReplyQueue
+            ejb_ee_deploy_mdb_ejbref_scope_Cyrano:
+              entries:
+                - ejb_ee_deploy_mdb_ejbref_scope_Cyrano
+            ejb_ee_deploy_mdb_ejbref_scope_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_ejbref_scope_ReplyQueue
+            ejb_ee_deploy_mdb_ejbref_scope_Romeo:
+              entries:
+                - ejb_ee_deploy_mdb_ejbref_scope_Romeo
+            ejb_ee_deploy_mdb_ejbref_scope_Tristan:
+              entries:
+                - ejb_ee_deploy_mdb_ejbref_scope_Tristan
+            ejb_ee_deploy_mdb_ejbref_singleT_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_ejbref_singleT_ReplyQueue
+            ejb_ee_deploy_mdb_ejbref_single_ReplyQueue:
+              entries:
+              - ejb_ee_deploy_mdb_ejbref_single_ReplyQueue
+            ejb_ee_deploy_mdb_ejbref_single_TestBean:
+              entries:
+                - ejb_ee_deploy_mdb_ejbref_single_TestBean
+            ejb_ee_deploy_mdb_ejbref_single_TestBeanBMT:
+              entries:
+                - ejb_ee_deploy_mdb_ejbref_single_TestBeanBMT
+            ejb_ee_deploy_mdb_enventry_casesensT_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_casesensT_ReplyQueue
+            ejb_ee_deploy_mdb_enventry_casesens_CaseBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_casesens_CaseBean
+            ejb_ee_deploy_mdb_enventry_casesens_CaseBeanBMT:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_casesens_CaseBeanBMT
+            ejb_ee_deploy_mdb_enventry_casesens_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_casesens_ReplyQueue
+            ejb_ee_deploy_mdb_enventry_scopeT_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_scopeT_ReplyQueue
+            ejb_ee_deploy_mdb_enventry_scope_Bean1_MultiJar:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_scope_Bean1_MultiJar
+            ejb_ee_deploy_mdb_enventry_scope_Bean1_SameJar:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_scope_Bean1_SameJar
+            ejb_ee_deploy_mdb_enventry_scope_Bean2_SameJar:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_scope_Bean2_SameJar
+            ejb_ee_deploy_mdb_enventry_scope_Bean2_MultiJar:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_scope_Bean2_MultiJar
+            ejb_ee_deploy_mdb_enventry_scope_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_scope_ReplyQueue
+            ejb_ee_deploy_mdb_enventry_singleT_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_singleT_ReplyQueue
+            ejb_ee_deploy_mdb_enventry_single_AllBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_single_AllBean
+            ejb_ee_deploy_mdb_enventry_single_AllBeanBMT:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_single_AllBeanBMT
+            ejb_ee_deploy_mdb_enventry_single_BooleanBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_single_BooleanBean
+            ejb_ee_deploy_mdb_enventry_single_ByteBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_single_ByteBean
+            ejb_ee_deploy_mdb_enventry_single_DoubleBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_single_DoubleBean
+            ejb_ee_deploy_mdb_enventry_single_FloatBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_single_FloatBean
+            ejb_ee_deploy_mdb_enventry_single_IntegerBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_single_IntegerBean
+            ejb_ee_deploy_mdb_enventry_single_LongBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_single_LongBean
+            ejb_ee_deploy_mdb_enventry_single_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_single_ReplyQueue
+            ejb_ee_deploy_mdb_enventry_single_ShortBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_single_ShortBean
+            ejb_ee_deploy_mdb_enventry_single_StringBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_single_StringBean
+            ejb_ee_deploy_mdb_resref_singleT_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_resref_singleT_ReplyQueue
+            ejb_ee_deploy_mdb_resref_single_ReplyQueue:
+              entries:
+                - ejb_ee_deploy_mdb_resref_single_ReplyQueue
+            ejb_ee_deploy_mdb_resref_single_TestBean:
+              entries:
+                - ejb_ee_deploy_mdb_resref_single_TestBean
+            ejb_ee_sec_stateful_mdb_MDB_QUEUE:
+              entries:
+                - ejb_ee_sec_stateful_mdb_MDB_QUEUE
+            ejb_ee_timer_mdb_MsgBean:
+              entries:
+                - ejb_ee_timer_mdb_MsgBean
+            fooQ:
+              entries:
+                - fooQ
+            jms_ee_mdb_mdb_exceptQ_MDB_QUEUETXNS_CMT:
+              entries:
+                - jms_ee_mdb_mdb_exceptQ_MDB_QUEUETXNS_CMT
+            jms_ee_mdb_mdb_exceptQ_MDB_QUEUE_BMT:
+              entries:
+                - jms_ee_mdb_mdb_exceptQ_MDB_QUEUE_BMT
+            jms_ee_mdb_mdb_exceptQ_MDB_QUEUE_CMT:
+              entries:
+                - jms_ee_mdb_mdb_exceptQ_MDB_QUEUE_CMT
+            jms_ee_mdb_mdb_exceptT_MDB_QUEUETXNS_CMT:
+              entries:
+                - jms_ee_mdb_mdb_exceptT_MDB_QUEUETXNS_CMT
+            jms_ee_mdb_mdb_exceptT_MDB_QUEUE_BMT:
+              entries:
+                - jms_ee_mdb_mdb_exceptT_MDB_QUEUE_BMT
+            jms_ee_mdb_mdb_exceptT_MDB_QUEUE_CMT:
+              entries:
+                - jms_ee_mdb_mdb_exceptT_MDB_QUEUE_CMT
+            jms_ee_mdb_mdb_msgHdrQ_MDB_QUEUE:
+              entries:
+                - jms_ee_mdb_mdb_msgHdrQ_MDB_QUEUE
+            jms_ee_mdb_mdb_msgPropsQ_MDB_QUEUE:
+              entries:
+                - jms_ee_mdb_mdb_msgPropsQ_MDB_QUEUE
+            jms_ee_mdb_mdb_msgTypesQ1_MDB_QUEUE:
+              entries:
+                - jms_ee_mdb_mdb_msgTypesQ1_MDB_QUEUE
+            jms_ee_mdb_mdb_msgTypesQ2_MDB_QUEUE:
+              entries:
+                - jms_ee_mdb_mdb_msgTypesQ2_MDB_QUEUE
+            jms_ee_mdb_mdb_msgTypesQ3_MDB_QUEUE:
+              entries:
+                - jms_ee_mdb_mdb_msgTypesQ3_MDB_QUEUE
+            jms_ee_mdb_mdb_rec_MDB_QUEUE:
+              entries:
+                - jms_ee_mdb_mdb_rec_MDB_QUEUE
+            jms_ee_mdb_mdb_sndToQueue_MDB_QUEUE:
+              entries:
+                - jms_ee_mdb_mdb_sndToQueue_MDB_QUEUE
+            jms_ee_mdb_mdb_sndQ_MDB_QUEUE:
+              entries:
+                - jms_ee_mdb_mdb_sndQ_MDB_QUEUE
+            jms_ee_mdb_mdb_synchrec_MDB_QUEUE:
+              entries:
+                - jms_ee_mdb_mdb_synchrec_MDB_QUEUE
+            jms_ee_mdb_xa_MDB_QUEUE_BMT:
+              entries:
+                - jms_ee_mdb_xa_MDB_QUEUE_BMT
+            jms_ee_mdb_xa_MDB_QUEUE_CMT:
+              entries:
+                - jms_ee_mdb_xa_MDB_QUEUE_CMT
+            ejb_sec_mdb_MDB_QUEUE_BMT:
+              entries:
+                - ejb_sec_mdb_MDB_QUEUE_BMT
+            ejb_sec_mdb_MDB_QUEUE_CMT:
+              entries:
+                - ejb_sec_mdb_MDB_QUEUE_CMT
+            testQ0:
+              entries:
+                - testQ0
+            testQ1:
+              entries:
+              - testQ1
+            testQ2:
+              entries:
+                - testQ2
+            testQueue2:
+              entries:
+                - testQueue2
+          jms-topic:
+            myTopic:
+              entries:
+                - myTopic
+            MY_TOPIC:
+              entries:
+                - MY_TOPIC
+            MY_TOPIC1:
+              entries:
+                - MY_TOPIC1
+            MY_TOPIC2:
+              entries:
+                - MY_TOPIC2
+            testT0:
+              entries:
+                - testT0
+            testT1:
+              entries:
+                - testT1
+            testT2:
+              entries:
+                - testT2
+            TOPIC_BMT:
+              entries:
+                - TOPIC_BMT
+            ejb_ee_bb_localaccess_mdbtaccesstest_MDB_TOPIC:
+              entries:
+                - ejb_ee_bb_localaccess_mdbtaccesstest_MDB_TOPIC
+            ejb_ee_deploy_mdb_ejblink_casesensT_TestBean:
+              entries:
+                - ejb_ee_deploy_mdb_ejblink_casesensT_TestBean
+            ejb_ee_deploy_mdb_ejblink_scopeT_TestBean:
+              entries:
+                - ejb_ee_deploy_mdb_ejblink_scopeT_TestBean
+            ejb_ee_deploy_mdb_ejblink_singleT_TestBean:
+              entries:
+                - ejb_ee_deploy_mdb_ejblink_singleT_TestBean
+            ejb_ee_deploy_mdb_ejblink_singleT_TestBeanBMT:
+              entries:
+                - ejb_ee_deploy_mdb_ejblink_singleT_TestBeanBMT
+            ejb_ee_deploy_mdb_ejbref_casesensT_TestBean:
+              entries:
+                - ejb_ee_deploy_mdb_ejbref_casesensT_TestBean
+            ejb_ee_deploy_mdb_ejbref_scopeT_Cyrano:
+              entries:
+                - ejb_ee_deploy_mdb_ejbref_scopeT_Cyrano
+            ejb_ee_deploy_mdb_ejbref_scopeT_Romeo:
+              entries:
+                - ejb_ee_deploy_mdb_ejbref_scopeT_Romeo
+            ejb_ee_deploy_mdb_ejbref_scopeT_Tristan:
+              entries:
+                - ejb_ee_deploy_mdb_ejbref_scopeT_Tristan
+            ejb_ee_deploy_mdb_ejbref_singleT_TestBean:
+              entries:
+                - ejb_ee_deploy_mdb_ejbref_singleT_TestBean
+            ejb_ee_deploy_mdb_ejbref_singleT_TestBeanBMT:
+              entries:
+                - ejb_ee_deploy_mdb_ejbref_singleT_TestBeanBMT
+            ejb_ee_deploy_mdb_enventry_casesensT_CaseBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_casesensT_CaseBean
+            ejb_ee_deploy_mdb_enventry_casesensT_CaseBeanBMT:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_casesensT_CaseBeanBMT
+            ejb_ee_deploy_mdb_enventry_scopeT_Bean1_MultiJar:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_scopeT_Bean1_MultiJar
+            ejb_ee_deploy_mdb_enventry_scopeT_Bean1_SameJar:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_scopeT_Bean1_SameJar
+            ejb_ee_deploy_mdb_enventry_scopeT_Bean2_MultiJar:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_scopeT_Bean2_MultiJar
+            ejb_ee_deploy_mdb_enventry_scopeT_Bean2_SameJar:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_scopeT_Bean2_SameJar
+            ejb_ee_deploy_mdb_enventry_singleT_AllBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_singleT_AllBean
+            ejb_ee_deploy_mdb_enventry_singleT_AllBeanBMT:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_singleT_AllBeanBMT
+            ejb_ee_deploy_mdb_enventry_singleT_BooleanBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_singleT_BooleanBean
+            ejb_ee_deploy_mdb_enventry_singleT_ByteBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_singleT_ByteBean
+            ejb_ee_deploy_mdb_enventry_singleT_DoubleBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_singleT_DoubleBean
+            ejb_ee_deploy_mdb_enventry_singleT_FloatBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_singleT_FloatBean
+            ejb_ee_deploy_mdb_enventry_singleT_IntegerBean:
+              entries:
+               - ejb_ee_deploy_mdb_enventry_singleT_IntegerBean
+            ejb_ee_deploy_mdb_enventry_singleT_LongBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_singleT_LongBean
+            ejb_ee_deploy_mdb_enventry_singleT_ShortBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_singleT_ShortBean
+            ejb_ee_deploy_mdb_enventry_singleT_StringBean:
+              entries:
+                - ejb_ee_deploy_mdb_enventry_singleT_StringBean
+            ejb_ee_deploy_mdb_resref_singleT_TestBean:
+              entries:
+                - ejb_ee_deploy_mdb_resref_singleT_TestBean
+            jms_ee_mdb_mdb_exceptT_MDB_DURABLETXNS_CMT:
+              entries:
+                - jms_ee_mdb_mdb_exceptT_MDB_DURABLETXNS_CMT
+            jms_ee_mdb_mdb_exceptT_MDB_DURABLE_BMT:
+              entries:
+                - jms_ee_mdb_mdb_exceptT_MDB_DURABLE_BMT
+            jms_ee_mdb_mdb_exceptT_MDB_DURABLE_CMT:
+              entries:
+                - jms_ee_mdb_mdb_exceptT_MDB_DURABLE_CMT
+            jms_ee_mdb_mdb_msgHdrT_MDB_TOPIC:
+              entries:
+                - jms_ee_mdb_mdb_msgHdrT_MDB_TOPIC
+            jms_ee_mdb_mdb_msgPropsT_MDB_TOPIC:
+              entries:
+                - jms_ee_mdb_mdb_msgPropsT_MDB_TOPIC
+            jms_ee_mdb_mdb_msgTypesT1_MDB_TOPIC:
+              entries:
+                - jms_ee_mdb_mdb_msgTypesT1_MDB_TOPIC
+            jms_ee_mdb_mdb_msgTypesT2_MDB_TOPIC:
+              entries:
+                - jms_ee_mdb_mdb_msgTypesT2_MDB_TOPIC
+            jms_ee_mdb_mdb_msgTypesT3_MDB_TOPIC:
+              entries:
+                - jms_ee_mdb_mdb_msgTypesT3_MDB_TOPIC
+            jms_ee_mdb_mdb_rec_MDB_TOPIC:
+              entries:
+                - jms_ee_mdb_mdb_rec_MDB_TOPIC
+            jms_ee_mdb_mdb_sndToTopic_MDB_TOPIC:
+              entries:
+                - jms_ee_mdb_mdb_sndToTopic_MDB_TOPIC
+            jms_ee_mdb_mdb_sndToTopic_MDB_TOPIC_REPLY:
+              entries:
+                - jms_ee_mdb_mdb_sndToTopic_MDB_TOPIC_REPLY
+            jms_ee_mdb_xa_MDB_DURABLE_BMT:
+              entries:
+                - jms_ee_mdb_xa_MDB_DURABLE_BMT
+            jms_ee_mdb_xa_MDB_DURABLE_CMT:
+              entries:
+                - jms_ee_mdb_xa_MDB_DURABLE_CMT
+    naming:
+      binding:
+        java:/custom/dog:
+          binding-type: object-factory
+          class: com.sun.ts.lib.deliverable.cts.resource.DogFactory
+          module: com.sun.ts
+    remoting:
+      http-connector:
+        http-remoting-connector:
+          sasl-authentication-factory: cts-sasl-authentication
+    resource-adapters:
+      resource-adapter:
+        whitebox-permissiondd.rar:
+          archive: whitebox-permissiondd.rar
+          connection-definitions:
+            wb-permissiondd-connection:
+              jndi-name: java:/eis/whitebox-permissiondd
+              class-name: com.sun.ts.tests.common.connector.whitebox.permissiondd.PermissionDDMCF
+              elytron-enabled: true
+              recovery-elytron-enabled: true
+              max-pool-size: 1000
+        whitebox-tx.rar:
+          archive: 'whitebox-tx.rar'
+          wm-security: 'true'
+          wm-elytron-security-domain: 'cts'
+          wm-security-mapping-required: 'false'
+          connection-definitions:
+            wb-tx-connection:
+              jndi-name: java:/eis/whitebox-tx
+              class-name: com.sun.ts.tests.common.connector.whitebox.LocalTxManagedConnectionFactory
+              elytron-enabled: true
+              recovery-elytron-enabled: true
+              max-pool-size: 1000
+        whitebox-notx.rar:
+          archive: 'whitebox-notx.rar'
+          wm-security: 'true'
+          wm-elytron-security-domain: 'cts'
+          wm-security-mapping-required: 'false'
+          connection-definitions:
+            wb-notx-connection:
+              jndi-name: java:/eis/whitebox-notx
+              class-name: com.sun.ts.tests.common.connector.whitebox.NoTxManagedConnectionFactory
+              elytron-enabled: true
+              recovery-elytron-enabled: true
+              max-pool-size: 1000
+        whitebox-xa.rar:
+          archive: 'whitebox-xa.rar'
+          wm-security: 'true'
+          wm-elytron-security-domain: 'cts'
+          wm-security-mapping-required: 'false'
+          connection-definitions:
+            wb-xa-connection:
+              jndi-name: java:/eis/whitebox-xa
+              class-name: com.sun.ts.tests.common.connector.whitebox.XAManagedConnectionFactory
+              elytron-enabled: true
+              max-pool-size: 1000
+              no-recovery: true
+        whitebox-tx-param.rar:
+          archive: 'whitebox-tx-param.rar'
+          wm-security: 'true'
+          wm-elytron-security-domain: 'cts'
+          wm-security-mapping-required: 'false'
+          connection-definitions:
+            wb-txparam-connection:
+              jndi-name: java:/eis/whitebox-tx-param
+              class-name: com.sun.ts.tests.common.connector.whitebox.LocalTxManagedConnectionFactory
+              elytron-enabled: true
+              recovery-elytron-enabled: true
+              max-pool-size: 1000
+        whitebox-notx-param.rar:
+          archive: 'whitebox-notx-param.rar'
+          wm-security: 'true'
+          wm-elytron-security-domain: 'cts'
+          wm-security-mapping-required: 'false'
+          connection-definitions:
+            wb-notxparam-connection:
+              jndi-name: java:/eis/whitebox-notx-param
+              class-name: com.sun.ts.tests.common.connector.whitebox.NoTxManagedConnectionFactory
+              elytron-enabled: true
+              recovery-elytron-enabled: true
+              max-pool-size: 1000
+        whitebox-xa-param.rar:
+          archive: 'whitebox-xa-param.rar'
+          wm-security: 'true'
+          wm-elytron-security-domain: 'cts'
+          wm-security-mapping-required: 'false'
+          connection-definitions:
+            wb-xaparam-connection:
+              jndi-name: java:/eis/whitebox-xa-param
+              class-name: com.sun.ts.tests.common.connector.whitebox.XAManagedConnectionFactory
+              elytron-enabled: true
+              max-pool-size: 1000
+              no-recovery: true
+        whitebox-anno_no_md.rar:
+          archive: 'whitebox-anno_no_md.rar'
+          wm-security: 'true'
+          wm-elytron-security-domain: 'cts'
+          wm-security-mapping-required: 'false'
+          connection-definitions:
+            wb-anno-connection:
+              jndi-name: java:/eis/whitebox-anno_no_md
+              class-name: com.sun.ts.tests.common.connector.whitebox.annotated.AnnoManagedConnectionFactory
+              elytron-enabled: true
+              max-pool-size: 1000
+        whitebox-ibanno_no_md.rar:
+          archive: 'whitebox-ibanno_no_md.rar'
+          wm-security: 'true'
+          wm-elytron-security-domain: 'cts'
+          wm-security-mapping-required: 'false'
+          connection-definitions:
+            wb-ibanno-connection:
+              jndi-name: java:/eis/whitebox-ibanno_no_md
+              class-name: com.sun.ts.tests.common.connector.whitebox.ibanno.IBAnnoManagedConnectionFactory
+              elytron-enabled: true
+              max-pool-size: 1000
+        whitebox-mixedmode.rar:
+          archive: 'whitebox-mixedmode.rar'
+          wm-security: 'true'
+          wm-elytron-security-domain: 'cts'
+          wm-security-mapping-required: 'false'
+          connection-definitions:
+            wb-mixed-connection:
+              jndi-name: java:/eis/whitebox-mixedmode
+              class-name: com.sun.ts.tests.common.connector.whitebox.mixedmode.PMDManagedConnectionFactory
+              elytron-enabled: true
+              max-pool-size: 1000
+        whitebox-multianno.rar:
+          archive: 'whitebox-multianno.rar'
+          wm-security: 'true'
+          wm-elytron-security-domain: 'cts'
+          wm-security-mapping-required: 'false'
+          connection-definitions:
+            wb-manno-connection:
+              jndi-name: java:/eis/whitebox-multianno
+              class-name: com.sun.ts.tests.common.connector.whitebox.multianno.MAManagedConnectionFactory
+              elytron-enabled: true
+              max-pool-size: 1000
+        whitebox-mdcomplete.rar:
+          archive: 'whitebox-mdcomplete.rar'
+          wm-security: 'true'
+          wm-elytron-security-domain: 'cts'
+          wm-security-mapping-required: 'false'
+          connection-definitions:
+            wb-md-connection:
+              jndi-name: java:/eis/whitebox-mdcomplete
+              class-name: com.sun.ts.tests.common.connector.whitebox.mdcomplete.MDCompleteMCF
+              elytron-enabled: true
+              max-pool-size: 1000
+    undertow:
+      default-security-domain: cts
+      server:
+        default-server:
+          http-listener:
+            default:
+              disallowed-methods:
+                - ''
+              max-post-size: 10485760
+          https-listener:
+            https:
+              ssl-context: 'cts-https-ssl-context'
+      application-security-domain:
+        cts:
+          http-authentication-factory: 'cts-http-authentication'
+          enable-jacc: false
+        cts-client-cert:
+          http-authentication-factory: 'cts-http-client-cert-authentication'
+          enable-jacc: false
+        cts-jaspi:
+          security-domain: 'cts'
+          integrated-jaspi: false
+  socket-binding-group:
+    standard-sockets:
+      remote-destination-outbound-socket-binding:
+        mail-smtp:
+          host: '${jboss.bind.address:127.0.0.1}'
+          port: 25
+        mail-pop3:
+          host: '${jboss.bind.address:127.0.0.1}'
+          port: 110
+        mail-imap:
+          host: '${jboss.bind.address:127.0.0.1}'
+          port: 143
+

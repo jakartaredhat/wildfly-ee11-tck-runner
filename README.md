@@ -41,3 +41,6 @@ the surefire. The most important system property is the `arquillian.xml` (-Darqu
 uses a non-default name. If youadd another container configuration for your server, either
 make it the default or change the `arquillian.launch` system property to the name of your
 configuration.
+
+## Running Vechicle tests in IDE
+The jms.core.bytesMsgTopic.*Test are exploring using the appclient and javatest Arquillian protocols to run the existing JavaTest based vehicles as is by subclassing the existing test class. Currently the jsp, servlet and ejb vehicles have tests that run. You need to point the ts.home property to an EE 10 TCK dist that has been updated for wildfly using the cts-10-mods.
