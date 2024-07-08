@@ -1,0 +1,19 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ClientJspTest" type="JUnit" factoryName="JUnit">
+    <module name="wildfly-tck-runner" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="jms.core.bytesMsgTopic.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <option name="PACKAGE_NAME" value="jms.core.bytesMsgTopic" />
+    <option name="MAIN_CLASS_NAME" value="jms.core.bytesMsgTopic.ClientJspTest" />
+    <option name="METHOD_NAME" value="" />
+    <option name="TEST_OBJECT" value="class" />
+    <option name="VM_PARAMETERS" value="-ea -Darquillian.xml=javatest-arquillian.xml" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

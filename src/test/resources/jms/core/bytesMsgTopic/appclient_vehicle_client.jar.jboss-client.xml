@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><jboss-client version="5.1">
+    <jndi-name/>
+    <resource-ref>
+        <res-ref-name>jms/MyTopicConnectionFactory</res-ref-name>
+        <lookup-name>java:/jms/TopicConnectionFactory</lookup-name>
+    </resource-ref>
+    <resource-env-ref>
+        <resource-env-ref-name>jms/MY_TOPIC</resource-env-ref-name>
+        <lookup-name>java:/MY_TOPIC</lookup-name>
+    </resource-env-ref>
+</jboss-client>

@@ -5,18 +5,19 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OverProtocol;
 import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.junit5.ArquillianExtension;
-import tck.arquillian.protocol.common.TargetVehicle;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import tck.arquillian.protocol.common.TargetVehicle;
 
 import java.net.URL;
 
 /**
  * This is a port of the {@link BytesMsgTopicTests} to Arquillian/Junit 5 via a
- * subclass. This targets the jsp vehicle.
+ * subclass. This targets the appclient vehicle.
  *
  * [starksm@scottryzen wildflytck-new]$ ls jakartaeetck/dist/com/sun/ts/tests/jms/core/bytesMsgTopic
  * bytesMsgTopic_appclient_vehicle_client.jar
@@ -43,65 +44,64 @@ import java.net.URL;
  * bytesMsgTopic_servlet_vehicle_web.war.sun-web.xml
  */
 @ExtendWith(ArquillianExtension.class)
-public class ClientJspTest extends  BytesMsgTopicTests {
-    static final String VEHICLE_ARCHIVE = "bytesMsgTopic_jsp_vehicle";
+public class ClientAppclientTest extends  BytesMsgTopicTests {
+    static final String VEHICLE_ARCHIVE = "bytesMsgTopic_appclient_vehicle";
 
-    @TargetsContainer("tck-javatest")
-    @OverProtocol("javatest")
+    // The ejb vehicle actually uses an appclient deployment to invoke the ejb container which calls the test method
+    // therefore, the protocol is appclient. It should be a TODO to remove that layer of indirection.
+    @TargetsContainer("tck-appclient")
+    @OverProtocol("appclient")
     @Deployment(name = VEHICLE_ARCHIVE)
-    public static EnterpriseArchive createDeploymentJspVehicle() {
-        WebArchive war = ShrinkWrap.create(WebArchive.class, VEHICLE_ARCHIVE+"_web.war");
-        war.addClasses(BytesMsgTopicTests.class,
-                Fault.class,
-                SetupException.class,
+    public static EnterpriseArchive createDeploymentAppclientVehicle() {
+        JavaArchive clientJar = ShrinkWrap.create(JavaArchive.class, VEHICLE_ARCHIVE+"_client.jar");
+        clientJar.addClasses(com.sun.ts.lib.harness.EETest.Fault.class,
+                com.sun.ts.lib.harness.EETest.SetupException.class,
                 com.sun.ts.lib.harness.EETest.class,
+                com.sun.ts.tests.jms.core.bytesMsgTopic.BytesMsgTopicTests.class,
                 com.sun.ts.lib.harness.ServiceEETest.class,
+                com.sun.ts.tests.common.vehicle.EmptyVehicleRunner.class,
                 com.sun.ts.tests.common.vehicle.VehicleClient.class,
                 com.sun.ts.tests.common.vehicle.VehicleRunnable.class,
                 com.sun.ts.tests.common.vehicle.VehicleRunnerFactory.class,
-                com.sun.ts.tests.common.vehicle.servlet.ServletVehicle.class,
+                com.sun.ts.tests.jms.core.bytesMsgTopic.BytesMsgTopicTests.class,
                 com.sun.ts.tests.jms.common.JmsTool.class
         );
-        // The jsp page
-        URL resURL = ClientJspTest.class.getResource("/vehicle/jsp/contentRoot/jsp_vehicle.jsp");
-        war.addAsWebResource(resURL, "/jsp_vehicle.jsp");
-        resURL = ClientJspTest.class.getResource("/vehicle/jsp/contentRoot/client.html");
-        war.addAsWebResource(resURL, "/client.html");
-        // Question of how to handle these. Right now they are copied into local resources dir.
-        resURL = BytesMsgTopicTests.class.getResource("/jms/core/bytesMsgTopic/jsp_vehicle_web.xml");
+        URL resURL = BytesMsgTopicTests.class.getResource("/jms/core/bytesMsgTopic/appclient_vehicle_client.xml");
         if(resURL != null) {
-            war.addAsWebInfResource(resURL, "web.xml");
+            clientJar.addAsManifestResource(resURL, "application-client.xml");
         }
-        resURL = BytesMsgTopicTests.class.getResource("/jms/core/bytesMsgTopic/jsp_vehicle_web.war.jboss-web.xml");
+        resURL = BytesMsgTopicTests.class.getResource("/jms/core/bytesMsgTopic/appclient_vehicle_client.jar.jboss-client.xml");
         if(resURL != null) {
-            war.addAsWebInfResource(resURL, "jboss-web.xml");
+            clientJar.addAsManifestResource(resURL, "jboss-client.xml");
         }
+        clientJar.addAsManifestResource(new StringAsset("Main-Class: com.sun.ts.tests.common.vehicle.VehicleClient\n"), "MANIFEST.MF");
 
         EnterpriseArchive ear = ShrinkWrap.create(EnterpriseArchive.class, VEHICLE_ARCHIVE+".ear");
-        ear.addAsModule(war);
+        ear.addAsModule(clientJar);
         return ear;
     }
 
-    public ClientJspTest() {
+    public ClientAppclientTest() {
         super();
     }
 
+    @TargetVehicle("appclient")
     @Test
-    @TargetVehicle("jsp")
+    @Override
     public void bytesMsgNullStreamTopicTest() throws Exception {
         super.bytesMsgNullStreamTopicTest();
     }
 
+    @TargetVehicle("appclient")
     @Test
     @Override
-    @TargetVehicle("jsp")
     public void bytesMessageTopicTestsFullMsg() throws Exception {
         super.bytesMessageTopicTestsFullMsg();
     }
 
+    @TargetVehicle("appclient")
     @Test
     @Override
-    @TargetVehicle("jsp")
     public void bytesMessageTNotWriteable() throws Exception {
         super.bytesMessageTNotWriteable();
     }
