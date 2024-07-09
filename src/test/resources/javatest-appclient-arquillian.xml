@@ -25,13 +25,13 @@
         <configuration>
             <property name="jbossHome">${jboss.home}</property>
             <property name="jbossArguments">-y=target/test-classes/wildfly-tck-min.yml</property>
-            <property name="javaVmArguments">-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=y</property>
+            <property name="javaVmArguments"><!-- -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=y --></property>
             <property name="serverConfig">${wildfly.standalone.config}</property>
             <property name="allowConnectingToRunningServer">false</property>
         </configuration>
         <protocol type="appclient">
             <property name="runClient">true</property>
-            <property name="runAsVehicle">true</property>
+            <property name="runAsVehicle">true</property>cl
             <property name="clientEarDir">target/appclient</property>
             <property name="clientCmdLineString">${jboss.home}/bin/appclient.sh;-y;target/test-classes/appclient.yml;${clientEarDir}/${vehicleArchiveName}.ear#${vehicleArchiveName}_client.jar</property>
             <property name="clientEnvString">MY_EN=my-env-stting;JAVA_OPTS=-Djboss.modules.system.pkgs=com.sun.ts.lib,com.sun.javatest;CLASSPATH=${project.build.directory}/appclient/javatest.jar:${project.build.directory}/appclient/libutil.jar:${project.build.directory}/appclient/libcommon.jar</property>
@@ -39,6 +39,7 @@
             <property name="workDir">${ts.home}/tmp</property>
             <property name="tsJteFile">${ts.home}/bin/ts.jte</property>
             <property name="trace">true</property>
+            <property name="clientTimeout">20000</property>
         </protocol>
     </container>
 </arquillian>

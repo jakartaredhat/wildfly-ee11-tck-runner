@@ -355,7 +355,7 @@
 
                 <executions>
                     <execution>
-                        <id>appclient-tests-tck</id>
+                        <id>appclient-tests</id>
                         <phase>test</phase>
                         <goals>
                             <goal>test</goal>
@@ -368,6 +368,41 @@
                             <systemPropertyVariables>
                                 <arquillian.launch>jboss-client-ee11-tck</arquillian.launch>
                                 <arquillian.xml>appclient-arquillian.xml</arquillian.xml>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>appclient-vehicle-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skip>false</skip>
+                            <testFailureIgnore>true</testFailureIgnore>
+                            <includes>
+                                <include>jms/core/bytesMsgTopic/ClientAppclientTest.java</include>
+                                <include>jms/core/bytesMsgTopic/ClientEjbTest.java</include>
+                            </includes>
+                            <systemPropertyVariables>
+                                <arquillian.xml>javatest-appclient-arquillian.xml</arquillian.xml>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>other-vehicle-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skip>false</skip>
+                            <includes>
+                                <include>jms/core/bytesMsgTopic/ClientJspTest.java</include>
+                                <include>jms/core/bytesMsgTopic/ClientServletTest.java</include>
+                            </includes>
+                            <systemPropertyVariables>
+                                <arquillian.xml>javatest-arquillian.xml</arquillian.xml>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
