@@ -1,7 +1,6 @@
 package jms.core.bytesMsgTopic;
 
 import com.sun.ts.tests.jms.core.bytesMsgTopic.BytesMsgTopicTests;
-import ejb30.bb.session.stateless.basic.ClientTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OverProtocol;
 import org.jboss.arquillian.container.test.api.TargetsContainer;
