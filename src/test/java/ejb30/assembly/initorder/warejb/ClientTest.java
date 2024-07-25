@@ -1,28 +1,28 @@
 package ejb30.assembly.initorder.warejb;
 
 import com.sun.ts.tests.ejb30.assembly.initorder.warejb.Client;
-
+import java.net.URL;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.OverProtocol;
 import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.junit5.ArquillianExtension;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
+import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import java.net.URL;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import tck.arquillian.porting.lib.spi.TestArchiveProcessor;
+import tck.arquillian.protocol.common.TargetVehicle;
 
-/**
- * An example of a non-vehicle client that needs an additiona common deployment
- * method for a common deployment archive as defined by the
- * src/com/sun/ts/lib/harness/commonarchives.properties file.
- */
+
+
 @ExtendWith(ArquillianExtension.class)
-public class ClientTest extends Client {
-    // TODO, this need to be generated
+public class ClientTest extends com.sun.ts.tests.ejb30.assembly.initorder.warejb.Client {
     @Deployment(name = "ejb3_common_helloejbjar_standalone_component", order = 1, testable = false)
     public static JavaArchive createCommonDeployment() {
         JavaArchive ejb3_common_helloejbjar_standalone_component_ejb = ShrinkWrap.create(JavaArchive.class, "ejb3_common_helloejbjar_standalone_component_ejb.jar");
@@ -46,7 +46,7 @@ public class ClientTest extends Client {
     @TargetsContainer("tck-javatest")
     @OverProtocol("javatest")
     @Deployment(name = "ejb3_assembly_initorder_warejb", order = 2)
-    public static EnterpriseArchive createDeployment() {
+    public static EnterpriseArchive createDeployment(@ArquillianResource TestArchiveProcessor archiveProcessor) {
         // War
         // the war with the correct archive name
         WebArchive ejb3_assembly_initorder_warejb_web = ShrinkWrap.create(WebArchive.class, "ejb3_assembly_initorder_warejb_web.war");
@@ -61,7 +61,12 @@ public class ClientTest extends Client {
         if(warResURL != null) {
             ejb3_assembly_initorder_warejb_web.addAsWebInfResource(warResURL, "web.xml");
         }
-        // TODO, does the sun-web.xml file need to be added or should this be in in the vendor Arquillian extension?
+        // The sun-web.xml descriptor
+        warResURL = Client.class.getResource("/com/sun/ts/tests/ejb30/assembly/initorder/warejb/ejb3_assembly_initorder_warejb_web.war.sun-web.xml");
+        if(warResURL != null) {
+            ejb3_assembly_initorder_warejb_web.addAsWebInfResource(warResURL, "sun-web.xml");
+            archiveProcessor.processWebArchive(ejb3_assembly_initorder_warejb_web, Client.class, warResURL);
+        }
         // Web content
 
 
@@ -81,15 +86,14 @@ public class ClientTest extends Client {
         ejbResURL = Client.class.getResource("/com/sun/ts/tests/ejb30/assembly/initorder/warejb/ejb3_assembly_initorder_warejb_ejb.jar.sun-ejb-jar.xml");
         if(ejbResURL != null) {
             ejb3_assembly_initorder_warejb_ejb.addAsManifestResource(ejbResURL, "sun-ejb-jar.xml");
-        }
-        // The jboss-ejb3.xml file
-        ejbResURL = ClientTest.class.getResource("/ejb30/assembly/initorder/warejb/ejb3_assembly_initorder_warejb_ejb.jar.jboss-ejb3.xml");
-        if(ejbResURL != null) {
-            ejb3_assembly_initorder_warejb_ejb.addAsManifestResource(ejbResURL, "jboss-ejb3.xml");
+            archiveProcessor.processEjbArchive(ejb3_assembly_initorder_warejb_ejb, Client.class, ejbResURL);
         }
 
         // Ear
         EnterpriseArchive ejb3_assembly_initorder_warejb_ear = ShrinkWrap.create(EnterpriseArchive.class, "ejb3_assembly_initorder_warejb.ear");
+
+        // Any libraries added to the ear
+        URL libURL;
         JavaArchive shared_lib = ShrinkWrap.create(JavaArchive.class, "shared.jar");
         // The class files
         shared_lib.addClasses(
@@ -101,33 +105,42 @@ public class ClientTest extends Client {
                 com.sun.ts.tests.ejb30.common.helloejbjar.HelloRemoteIF.class
         );
 
+
+        ejb3_assembly_initorder_warejb_ear.addAsLibrary(shared_lib);
+
+
         // The component jars built by the package target
         ejb3_assembly_initorder_warejb_ear.addAsModule(ejb3_assembly_initorder_warejb_ejb);
         ejb3_assembly_initorder_warejb_ear.addAsModule(ejb3_assembly_initorder_warejb_web);
 
-        // The libraries added to the ear
-        ejb3_assembly_initorder_warejb_ear.addAsLibrary(shared_lib);
 
         // The application.xml descriptor
-        URL earResURL = ClientTest.class.getResource("/com/sun/ts/tests/ejb30/assembly/initorder/warejb/application.xml");
+        URL earResURL = Client.class.getResource("/com/sun/ts/tests/ejb30/assembly/initorder/warejb/application.xml");
         if(earResURL != null) {
             ejb3_assembly_initorder_warejb_ear.addAsManifestResource(earResURL, "application.xml");
         }
-
+        // The sun-application.xml descriptor
+        earResURL = Client.class.getResource("/com/sun/ts/tests/ejb30/assembly/initorder/warejb/application.ear.sun-application.xml");
+        if(earResURL != null) {
+            ejb3_assembly_initorder_warejb_ear.addAsManifestResource(earResURL, "sun-application.xml");
+            archiveProcessor.processEarArchive(ejb3_assembly_initorder_warejb_ear, Client.class, earResURL);
+        }
         return ejb3_assembly_initorder_warejb_ear;
     }
 
     @Test
-    @OperateOnDeployment("ejb3_assembly_initorder_warejb")
     @Override
+    @OperateOnDeployment("ejb3_assembly_initorder_warejb")
     public void initOrder() throws Exception {
         super.initOrder();
     }
 
     @Test
-    @OperateOnDeployment("ejb3_assembly_initorder_warejb")
     @Override
+    @OperateOnDeployment("ejb3_assembly_initorder_warejb")
     public void appName() throws Exception {
         super.appName();
     }
+
+
 }

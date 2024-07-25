@@ -1,89 +1,84 @@
 package jms.core.bytesMsgTopic;
 
 import com.sun.ts.tests.jms.core.bytesMsgTopic.BytesMsgTopicTests;
+import java.net.URL;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.OverProtocol;
 import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.junit5.ArquillianExtension;
-import tck.arquillian.protocol.common.TargetVehicle;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
+import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import tck.arquillian.protocol.common.TargetVehicle;
 
-import java.net.URL;
 
-/**
- * This is a port of the {@link BytesMsgTopicTests} to Arquillian/Junit 5 via a
- * subclass. This targets the servlet vehicle.
- *
- * [starksm@scottryzen wildflytck-new]$ ls jakartaeetck/dist/com/sun/ts/tests/jms/core/bytesMsgTopic
- * bytesMsgTopic_appclient_vehicle_client.jar
- * bytesMsgTopic_appclient_vehicle_client.jar.jboss-client.xml
- * bytesMsgTopic_appclient_vehicle_client.jar.sun-application-client.xml
- * bytesMsgTopic_appclient_vehicle.ear
- * bytesMsgTopic_ejb_vehicle_client.jar
- * bytesMsgTopic_ejb_vehicle_client.jar.jboss-client.xml
- * bytesMsgTopic_ejb_vehicle_client.jar.sun-application-client.xml
- * bytesMsgTopic_ejb_vehicle.ear
- * bytesMsgTopic_ejb_vehicle_ejb.jar
- * bytesMsgTopic_ejb_vehicle_ejb.jar.jboss-ejb3.xml
- * bytesMsgTopic_ejb_vehicle_ejb.jar.jboss-webservices.xml
- * bytesMsgTopic_ejb_vehicle_ejb.jar.sun-ejb-jar.xml
- * bytesMsgTopic_jsp_vehicle.ear
- * bytesMsgTopic_jsp_vehicle_web.war
- * bytesMsgTopic_jsp_vehicle_web.war.jboss-webservices.xml
- * bytesMsgTopic_jsp_vehicle_web.war.jboss-web.xml
- * bytesMsgTopic_jsp_vehicle_web.war.sun-web.xml
- * bytesMsgTopic_servlet_vehicle.ear
- * bytesMsgTopic_servlet_vehicle_web.war
- * bytesMsgTopic_servlet_vehicle_web.war.jboss-webservices.xml
- * bytesMsgTopic_servlet_vehicle_web.war.jboss-web.xml
- * bytesMsgTopic_servlet_vehicle_web.war.sun-web.xml
- */
+
 @ExtendWith(ArquillianExtension.class)
-public class ClientServletTest extends  BytesMsgTopicTests {
+public class ClientServletTest extends com.sun.ts.tests.jms.core.bytesMsgTopic.BytesMsgTopicTests {
     static final String VEHICLE_ARCHIVE = "bytesMsgTopic_servlet_vehicle";
-
     @TargetsContainer("tck-javatest")
     @OverProtocol("javatest")
     @Deployment(name = VEHICLE_ARCHIVE)
-    public static EnterpriseArchive createDeploymentServletVehicle() {
-        WebArchive war = ShrinkWrap.create(WebArchive.class, VEHICLE_ARCHIVE+"_web.war");
-        war.addClasses(BytesMsgTopicTests.class,
-                Fault.class,
-                SetupException.class,
-                com.sun.ts.lib.harness.EETest.class,
-                com.sun.ts.lib.harness.ServiceEETest.class,
-                com.sun.ts.tests.common.vehicle.VehicleClient.class,
+    public static EnterpriseArchive createDeploymentVehicle() {
+        // War
+        // the war with the correct archive name
+        WebArchive bytesMsgTopic_servlet_vehicle_web = ShrinkWrap.create(WebArchive.class, "bytesMsgTopic_servlet_vehicle_web.war");
+        // The class files
+        bytesMsgTopic_servlet_vehicle_web.addClasses(
+                com.sun.ts.tests.common.vehicle.servlet.ServletVehicle.class,
+                com.sun.ts.tests.jms.common.JmsTool.class,
                 com.sun.ts.tests.common.vehicle.VehicleRunnable.class,
                 com.sun.ts.tests.common.vehicle.VehicleRunnerFactory.class,
-                com.sun.ts.tests.common.vehicle.servlet.ServletVehicle.class,
-                BytesMsgTopicTests.class,
-                com.sun.ts.tests.jms.common.JmsTool.class
+                com.sun.ts.lib.harness.EETest.Fault.class,
+                com.sun.ts.tests.jms.core.bytesMsgTopic.BytesMsgTopicTests.class,
+                com.sun.ts.lib.harness.EETest.class,
+                com.sun.ts.lib.harness.ServiceEETest.class,
+                com.sun.ts.lib.harness.EETest.SetupException.class,
+                com.sun.ts.tests.common.vehicle.VehicleClient.class
         );
-        // Question of how to handle these. Right now they are copied into local resources dir.
-        URL resURL = BytesMsgTopicTests.class.getResource("/jms/core/bytesMsgTopic/servlet_vehicle_web.xml");
-        if(resURL != null) {
-            war.addAsWebInfResource(resURL, "web.xml");
+        // The web.xml descriptor
+        URL warResURL = BytesMsgTopicTests.class.getResource("/vehicle/servlet/servlet_vehicle_web.xml");
+        if(warResURL != null) {
+            bytesMsgTopic_servlet_vehicle_web.addAsWebInfResource(warResURL, "web.xml");
         }
-        resURL = BytesMsgTopicTests.class.getResource("/jms/core/bytesMsgTopic/servlet_vehicle_web.war.jboss-web.xml");
-        if(resURL != null) {
-            war.addAsWebInfResource(resURL, "jboss-web.xml");
+        // The sun-web.xml descriptor
+        warResURL = BytesMsgTopicTests.class.getResource("/vehicle/servlet/servlet_vehicle_web.war.sun-web.xml");
+        if(warResURL != null) {
+            bytesMsgTopic_servlet_vehicle_web.addAsWebInfResource(warResURL, "sun-web.xml");
         }
+        // Web content
 
-        EnterpriseArchive ear = ShrinkWrap.create(EnterpriseArchive.class, VEHICLE_ARCHIVE+".ear");
-        ear.addAsModule(war);
-        return ear;
-    }
 
-    public ClientServletTest() {
-        super();
+        // Ear
+        EnterpriseArchive bytesMsgTopic_servlet_vehicle_ear = ShrinkWrap.create(EnterpriseArchive.class, "bytesMsgTopic_servlet_vehicle.ear");
+
+        // Any libraries added to the ear
+
+        // The component jars built by the package target
+        bytesMsgTopic_servlet_vehicle_ear.addAsModule(bytesMsgTopic_servlet_vehicle_web);
+
+
+        // The application.xml descriptor
+        URL earResURL = BytesMsgTopicTests.class.getResource("/com/sun/ts/tests/jms/core/bytesMsgTopic/");
+        if(earResURL != null) {
+            bytesMsgTopic_servlet_vehicle_ear.addAsManifestResource(earResURL, "application.xml");
+        }
+        // The sun-application.xml descriptor
+        earResURL = BytesMsgTopicTests.class.getResource("/com/sun/ts/tests/jms/core/bytesMsgTopic/.ear.sun-application.xml");
+        if(earResURL != null) {
+            bytesMsgTopic_servlet_vehicle_ear.addAsManifestResource(earResURL, "sun-application.xml");
+        }
+        return bytesMsgTopic_servlet_vehicle_ear;
     }
 
     @Test
+    @Override
     @TargetVehicle("servlet")
     public void bytesMsgNullStreamTopicTest() throws Exception {
         super.bytesMsgNullStreamTopicTest();
@@ -102,4 +97,6 @@ public class ClientServletTest extends  BytesMsgTopicTests {
     public void bytesMessageTNotWriteable() throws Exception {
         super.bytesMessageTNotWriteable();
     }
+
+
 }

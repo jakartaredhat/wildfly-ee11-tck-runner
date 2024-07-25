@@ -1,24 +1,32 @@
 package ejb30.misc.sameejbclass;
 
+import com.sun.ts.tests.ejb30.misc.sameejbclass.Client;
+import java.net.URL;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.OverProtocol;
 import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.junit5.ArquillianExtension;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
+import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import java.net.URL;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import com.sun.ts.tests.ejb30.misc.sameejbclass.Client;
+import tck.arquillian.porting.lib.spi.TestArchiveProcessor;
+import tck.arquillian.protocol.common.TargetVehicle;
+
+
 
 @ExtendWith(ArquillianExtension.class)
 public class ClientTest extends com.sun.ts.tests.ejb30.misc.sameejbclass.Client {
     @TargetsContainer("tck-javatest")
     @OverProtocol("javatest")
-    @Deployment(name = "misc_sameejbclass")
-    public static EnterpriseArchive createDeployment() {
+    @Deployment(name = "misc_sameejbclass", order = 2)
+    public static EnterpriseArchive createDeployment(@ArquillianResource TestArchiveProcessor archiveProcessor) {
         // War
         // the war with the correct archive name
         WebArchive misc_sameejbclass_web = ShrinkWrap.create(WebArchive.class, "misc_sameejbclass_web.war");
@@ -37,6 +45,7 @@ public class ClientTest extends com.sun.ts.tests.ejb30.misc.sameejbclass.Client 
         warResURL = Client.class.getResource("/com/sun/ts/tests/ejb30/misc/sameejbclass/misc_sameejbclass_web.war.sun-web.xml");
         if(warResURL != null) {
             misc_sameejbclass_web.addAsWebInfResource(warResURL, "sun-web.xml");
+            archiveProcessor.processWebArchive(misc_sameejbclass_web, Client.class, warResURL);
         }
         // Web content
 
@@ -57,15 +66,14 @@ public class ClientTest extends com.sun.ts.tests.ejb30.misc.sameejbclass.Client 
         ejbResURL = Client.class.getResource("/com/sun/ts/tests/ejb30/misc/sameejbclass/misc_sameejbclass_ejb.jar.sun-ejb-jar.xml");
         if(ejbResURL != null) {
             misc_sameejbclass_ejb.addAsManifestResource(ejbResURL, "sun-ejb-jar.xml");
-        }
-        // The jboss-ebj3.xml file
-        ejbResURL = ClientTest.class.getResource("/ejb30/misc/sameejbclass/misc_sameejbclass_ejb.jar.jboss-ejb3.xml");
-        if(ejbResURL != null) {
-            misc_sameejbclass_ejb.addAsManifestResource(ejbResURL, "jboss-ejb3.xml");
+            archiveProcessor.processEjbArchive(misc_sameejbclass_ejb, Client.class, ejbResURL);
         }
 
         // Ear
         EnterpriseArchive misc_sameejbclass_ear = ShrinkWrap.create(EnterpriseArchive.class, "misc_sameejbclass.ear");
+
+        // Any libraries added to the ear
+        URL libURL;
         JavaArchive shared_lib = ShrinkWrap.create(JavaArchive.class, "shared.jar");
         // The class files
         shared_lib.addClasses(
@@ -76,12 +84,14 @@ public class ClientTest extends com.sun.ts.tests.ejb30.misc.sameejbclass.Client 
                 com.sun.ts.tests.ejb30.common.helper.TLogger.class
         );
 
+
+        misc_sameejbclass_ear.addAsLibrary(shared_lib);
+
+
         // The component jars built by the package target
         misc_sameejbclass_ear.addAsModule(misc_sameejbclass_ejb);
         misc_sameejbclass_ear.addAsModule(misc_sameejbclass_web);
 
-        // The libraries added to the ear
-        misc_sameejbclass_ear.addAsLibrary(shared_lib);
 
         // The application.xml descriptor
         URL earResURL = Client.class.getResource("/com/sun/ts/tests/ejb30/misc/sameejbclass/application.xml");
@@ -92,6 +102,7 @@ public class ClientTest extends com.sun.ts.tests.ejb30.misc.sameejbclass.Client 
         earResURL = Client.class.getResource("/com/sun/ts/tests/ejb30/misc/sameejbclass/application.ear.sun-application.xml");
         if(earResURL != null) {
             misc_sameejbclass_ear.addAsManifestResource(earResURL, "sun-application.xml");
+            archiveProcessor.processEarArchive(misc_sameejbclass_ear, Client.class, earResURL);
         }
         return misc_sameejbclass_ear;
     }
@@ -107,5 +118,6 @@ public class ClientTest extends com.sun.ts.tests.ejb30.misc.sameejbclass.Client 
     public void testDTO() throws Exception {
         super.testDTO();
     }
+
 
 }
