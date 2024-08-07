@@ -42,7 +42,7 @@
         <version.jakarta.inject>2.0.1</version.jakarta.inject>
         <version.jakarta.servlet>5.0.0</version.jakarta.servlet>
         <version.jakarta.tck>11.0.0-SNAPSHOT</version.jakarta.tck>
-        <version.jakarta.tck.arquillian>1.0.0-M1</version.jakarta.tck.arquillian>
+        <version.jakarta.tck.arquillian>1.0.0-SNAPSHOT</version.jakarta.tck.arquillian>
         <version.org.wildfly.checkstyle-config>1.0.8.Final</version.org.wildfly.checkstyle-config>
         <!-- TCK properties -->
         <ts.home>/home/starksm/Dev/Jakarta/wildflytck-new/jakartaeetck</ts.home>
@@ -164,6 +164,12 @@
         </dependency>
         <dependency>
             <groupId>jakarta.tck</groupId>
+            <artifactId>persistence-tck-spec-tests</artifactId>
+            <version>3.2.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.tck</groupId>
             <artifactId>jms</artifactId>
             <version>${version.jakarta.tck}</version>
             <scope>test</scope>
@@ -179,12 +185,18 @@
             <artifactId>signaturetest</artifactId>
             <version>${version.jakarta.tck}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jboss.arquillian.junit</groupId>
-                    <artifactId>arquillian-junit-core</artifactId>
-                </exclusion>
-            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.tck</groupId>
+            <artifactId>jsonp-platform-tck</artifactId>
+            <version>${version.jakarta.tck}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.tck</groupId>
+            <artifactId>runtime</artifactId>
+            <version>${version.jakarta.tck}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.tck.arquillian</groupId>
@@ -344,7 +356,7 @@
                         <id>unpack</id>
                         <phase>process-test-resources</phase>
                         <goals>
-                            <goal>copy</goal>
+                            <goal>unpack</goal>
                         </goals>
                         <configuration>
                             <artifactItems>
@@ -353,9 +365,8 @@
                                     <artifactId>libutil</artifactId>
                                     <version>${version.jakarta.tck}</version>
                                     <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/appclient</outputDirectory>
-                                    <destFileName>libutil.jar</destFileName>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/protocol</outputDirectory>
                                     <includes>**/*.class,**/*.xml</includes>
                                 </artifactItem>
                                 <artifactItem>
@@ -363,36 +374,34 @@
                                     <artifactId>common</artifactId>
                                     <version>${version.jakarta.tck}</version>
                                     <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/appclient</outputDirectory>
-                                    <destFileName>libcommon.jar</destFileName>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/protocol</outputDirectory>
                                     <includes>**/*.class,**/*.xml</includes>
+                                    <excludes>com/sun/ts/tests/common/vehicle/**</excludes>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>javatest</groupId>
-                                    <artifactId>javatest</artifactId>
-                                    <version>5.0</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/appclient</outputDirectory>
-                                    <destFileName>javatest.jar</destFileName>
-                                    <includes>**/*.class,**/*.xml</includes>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>jakarta.platform</groupId>
-                                    <artifactId>jakarta.jakartaee-api</artifactId>
-                                    <version>10.0.0</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/appclient</outputDirectory>
-                                    <destFileName>jakartaee-api.jar</destFileName>
-                                    <includes>**/*.class,**/*.xml</includes>
-                                </artifactItem>
+
                             </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>protocol-lib</id>
+                        <goals><goal>jar</goal></goals>
+                        <phase>process-test-resources</phase>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/protocol</outputDirectory>
+                            <finalName>protocol</finalName>
+                            <classesDirectory>${project.build.directory}/protocol</classesDirectory>
+                            <includes>com/**</includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

@@ -71,6 +71,11 @@ public class JBossXmlProcessor extends AbstractTestArchiveProcessor {
     }
 
     @Override
+    public void processParArchive(JavaArchive javaArchive, Class<?> aClass, URL url) {
+
+    }
+
+    @Override
     public void processEarArchive(EnterpriseArchive earArchive, Class<?> testClass, URL sunXmlURL) {
 
     }

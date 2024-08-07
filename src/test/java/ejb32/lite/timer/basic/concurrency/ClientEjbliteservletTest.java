@@ -59,7 +59,7 @@ public class ClientEjbliteservletTest extends Client {
             SetupException.class
             );
             // The web.xml descriptor
-            URL warResURL = Client.class.getResource("/vehicle/ejbliteservlet/ejbliteservlet_vehicle_web.xml");
+            URL warResURL = Client.class.getResource("ejbliteservlet_vehicle_web.xml");
             if(warResURL != null) {
               ejb32_lite_timer_basic_concurrency_ejbliteservlet_vehicle_web.addAsWebInfResource(warResURL, "web.xml");
             }
