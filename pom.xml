@@ -42,7 +42,7 @@
         <version.jakarta.inject>2.0.1</version.jakarta.inject>
         <version.jakarta.servlet>5.0.0</version.jakarta.servlet>
         <version.jakarta.tck>11.0.0-SNAPSHOT</version.jakarta.tck>
-        <version.jakarta.tck.arquillian>1.0.0-SNAPSHOT</version.jakarta.tck.arquillian>
+        <version.jakarta.tck.arquillian>1.0.0-M5</version.jakarta.tck.arquillian>
         <version.org.wildfly.checkstyle-config>1.0.8.Final</version.org.wildfly.checkstyle-config>
         <!-- TCK properties -->
         <ts.home>/home/starksm/Dev/Jakarta/wildflytck-new/jakartaeetck</ts.home>
@@ -312,7 +312,7 @@
         <dependency>
             <groupId>org.wildfly.arquillian</groupId>
             <artifactId>wildfly-arquillian-container-managed</artifactId>
-            <version>5.1.0.Beta1</version>
+            <version>5.1.0.Beta4</version>
         </dependency>
 
         <dependency>
@@ -360,50 +360,23 @@
                 <version>3.6.1</version>
                 <executions>
                     <execution>
-                        <id>unpack</id>
+                        <id>copy-protocol-lib</id>
                         <phase>process-test-resources</phase>
                         <goals>
-                            <goal>unpack</goal>
+                            <goal>copy</goal>
                         </goals>
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>jakarta.tck</groupId>
-                                    <artifactId>libutil</artifactId>
-                                    <version>${version.jakarta.tck}</version>
+                                    <groupId>jakarta.tck.arquillian</groupId>
+                                    <artifactId>arquillian-protocol-lib</artifactId>
+                                    <version>${version.jakarta.tck.arquillian}</version>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/protocol</outputDirectory>
-                                    <includes>**/*.class,**/*.xml</includes>
+                                    <destFileName>protocol.jar</destFileName>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>jakarta.tck</groupId>
-                                    <artifactId>common</artifactId>
-                                    <version>${version.jakarta.tck}</version>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/protocol</outputDirectory>
-                                    <includes>**/*.class,**/*.xml</includes>
-                                    <excludes>com/sun/ts/tests/common/vehicle/**</excludes>
-                                </artifactItem>
-
                             </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>protocol-lib</id>
-                        <goals><goal>jar</goal></goals>
-                        <phase>process-test-resources</phase>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/protocol</outputDirectory>
-                            <finalName>protocol</finalName>
-                            <classesDirectory>${project.build.directory}/protocol</classesDirectory>
-                            <includes>com/**</includes>
                         </configuration>
                     </execution>
                 </executions>
@@ -422,54 +395,20 @@
                         <include>**/*TestSuite.java</include>
                     </includes>
                 </configuration>
-
                 <executions>
                     <execution>
-                        <id>appclient-tests</id>
+                        <id>ejb32</id>
                         <phase>test</phase>
                         <goals>
                             <goal>test</goal>
                         </goals>
                         <configuration>
+                            <dependenciesToScan>jakarta.tck:ejb32</dependenciesToScan>
                             <skip>false</skip>
+                            <groups>tck-javatest</groups>
                             <includes>
-                                <include>ejb30/bb/session/stateless/basic/ClientTest.java</include>
-                            </includes>
-                            <systemPropertyVariables>
-                                <arquillian.launch>jboss-client-ee11-tck</arquillian.launch>
-                                <arquillian.xml>appclient-arquillian.xml</arquillian.xml>
-                            </systemPropertyVariables>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>appclient-vehicle-tests</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <configuration>
-                            <skip>false</skip>
-                            <testFailureIgnore>true</testFailureIgnore>
-                            <includes>
-                                <include>jms/core/bytesMsgTopic/ClientAppclientTest.java</include>
-                                <include>jms/core/bytesMsgTopic/ClientEjbTest.java</include>
-                            </includes>
-                            <systemPropertyVariables>
-                                <arquillian.xml>javatest-appclient-arquillian.xml</arquillian.xml>
-                            </systemPropertyVariables>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>other-vehicle-tests</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <configuration>
-                            <skip>false</skip>
-                            <includes>
-                                <include>jms/core/bytesMsgTopic/ClientJspTest.java</include>
-                                <include>jms/core/bytesMsgTopic/ClientServletTest.java</include>
+                                <include>com/sun/ts/tests/ejb32/**/*Test.java</include>
+                                <!--include>com.sun.ts.tests.ejb32.timer.service.stateless.ClientEjbliteservletTest</include-->
                             </includes>
                             <systemPropertyVariables>
                                 <arquillian.xml>javatest-arquillian.xml</arquillian.xml>
@@ -479,87 +418,45 @@
                 </executions>
             </plugin>
         </plugins>
+
+
     </build>
-
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <outputName>jakartaee-report</outputName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
     <profiles>
-        <!-- Install wildfly to target/wildfly -->
-        <profile>
-            <id>install-wildfly</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.wildfly.plugins</groupId>
-                        <artifactId>wildfly-maven-plugin</artifactId>
-                        <version>${version.wildfly.maven.plugin}</version>
-                        <executions>
-                            <execution>
-                                <id>install-wildfly</id>
-                                <phase>initialize</phase>
-                                <goals>
-                                    <goal>provision</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <provisioningDir>${jboss.home}</provisioningDir>
-                            <feature-packs>
-                                <feature-pack>
-                                    <groupId>org.wildfly</groupId>
-                                    <artifactId>wildfly-galleon-pack</artifactId>
-                                    <version>${version.wildfly}</version>
-                                </feature-pack>
-                            </feature-packs>
-                        </configuration>
-                    </plugin>
-
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>debug</id>
-            <activation>
-                <property>
-                    <name>debug</name>
-                </property>
-            </activation>
-            <properties>
-                <debug.vm.args>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:${debug.port}
-                </debug.vm.args>
-            </properties>
-        </profile>
-    </profiles>
-
-    <repositories>
-        <repository>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
-            <id>jboss-public-repository</id>
-            <name>JBoss Public Repository Group</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
-            <id>jboss-enterprise-maven-repository</id>
-            <name>JBoss Enterprise Maven Repository</name>
-            <url>https://maven.repository.redhat.com/ga/</url>
-            <layout>default</layout>
-        </repository>
-    </repositories>
-
+       <!--
+    This profile enables consuming artifacts from the ossrh staging
+    repository group.
+-->
+       <profile>
+           <id>staging</id>
+           <activation>
+               <activeByDefault>false</activeByDefault>
+           </activation>
+           <repositories>
+               <repository>
+                   <id>sonatype-nexus-staging</id>
+                   <name>Sonatype Nexus Staging</name>
+                   <url>https://jakarta.oss.sonatype.org/content/repositories/staging/</url>
+                   <releases>
+                       <enabled>true</enabled>
+                   </releases>
+                   <snapshots>
+                       <enabled>false</enabled>
+                   </snapshots>
+               </repository>
+           </repositories>
+       </profile>
+   </profiles>
 </project>
 
