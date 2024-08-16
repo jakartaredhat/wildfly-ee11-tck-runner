@@ -45,13 +45,13 @@
         <version.jakarta.tck.arquillian>1.0.0-M7</version.jakarta.tck.arquillian>
         <version.org.wildfly.checkstyle-config>1.0.8.Final</version.org.wildfly.checkstyle-config>
         <!-- TCK properties -->
-        <ts.home>/home/starksm/Dev/Jakarta/wildflytck-new/jakartaeetck</ts.home>
+        <ts.home>/home/smarlow/tck/tck10/jakartaeetck</ts.home>
 
         <!-- Galleon -->
         <galleon.fork.embedded>true</galleon.fork.embedded>
         <galleon.log.time>true</galleon.log.time>
         <galleon.offline>false</galleon.offline>
-        <jboss.home>/home/starksm/Dev/Jakarta/wildflytck-new/wildfly/dist/target/wildfly-33.0.0.Beta1-SNAPSHOT</jboss.home>
+        <jboss.home>/home/smarlow/tck/wildfly/dist/target/wildfly-34.0.0.Beta1-SNAPSHOT</jboss.home>
         <galleon.feature.pack.artifactId>wildfly-ee-galleon-pack</galleon.feature.pack.artifactId>
         <galleon.feature.pack.location>
             wildfly@maven(org.jboss.universe:community-universe)#${version.org.wildfly.full}

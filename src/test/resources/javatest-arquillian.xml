@@ -22,7 +22,7 @@
         <property name="deploymentExportPath">target/deployments</property>
     </engine>
     <extension qualifier="jboss-descriptors">
-        <property name="descriptorDir">/home/starksm/Dev/Jakarta/wildflytck-new/cts-10-mods/output/classes</property>
+        <property name="descriptorDir">/home/smarlow/tck/tck10/cts-10-mods/resources</property>
     </extension>
 
     <container qualifier="tck-javatest" default="true">
