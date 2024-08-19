@@ -20,9 +20,11 @@ public class JavaDBSetupExtension extends XATimerSuite implements BeforeAllCallb
         Path tsHome = Paths.get(System.getProperty("ts.home"));
         Path derbyHome = tsHome.resolve("../glassfish7/javadb");
         JavaDBController controller = new JavaDBController();
-        System.out.println("StartStopTest.starting JavaDB with derbyHome="+derbyHome);
+        System.out.println("JavaDBSetupExtension.starting JavaDB with derbyHome="+derbyHome);
+        extensionContext.publishReportEntry("JavaDBSetupExtension.beforeAll", "JavaDBSetupExtension.starting JavaDB with derbyHome="+derbyHome);
         controller.startJavaDB(derbyHome);
-        System.out.println("StartStopTest.started JavaDB");
+        System.out.println("JavaDBSetupExtension.started JavaDB");
+        extensionContext.publishReportEntry("JavaDBSetupExtension.beforeAll", "Starting JavaDB");
     }
 
     @Override

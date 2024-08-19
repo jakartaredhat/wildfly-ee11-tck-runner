@@ -210,6 +210,15 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-suite-engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-reporting</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>jakarta.ejb</groupId>
@@ -394,9 +403,18 @@
                                 <!--include>com/sun/ts/tests/ejb32/lite/timer/basic/concurrency/JsfClientEjblitejspTest.java</include-->
                                 <!--include>com.sun.ts.tests.ejb32.timer.service.stateless.ClientEjbliteservletTest</include-->
                                 <!--include>com.sun.ts.tests.ejb32.lite.timer.basic.xa.ClientEjbliteservletTest</include-->
-                                <include>com/sun/ts/tests/ejb32/lite/timer/basic/*Test.java</include>
+                                <!--include>com/sun/ts/tests/ejb32/lite/timer/basic/*Test.java</include-->
+                                <!--include>com.sun.ts.tests.ejb32.lite.timer.basic.xa.XATimerSuite</include-->
                                 <include>ejb32.lite.timer.basic.xa.JavaDBSetupExtension</include>
                             </includes>
+                            <properties>
+                                <configurationParameters>
+                                    junit.platform.output.capture.stderr = true
+                                    junit.platform.output.capture.stdout = true
+                                    junit.platform.reporting.open.xml.enabled = true
+                                    junit.platform.reporting.output.dir = target/junit5-reports
+                                </configurationParameters>
+                            </properties>
                             <systemPropertyVariables>
                                 <arquillian.xml>javatest-arquillian.xml</arquillian.xml>
                                 <ts.home>${ts.home}</ts.home>
