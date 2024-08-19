@@ -409,6 +409,7 @@
                             </includes>
                             <properties>
                                 <configurationParameters>
+                                    junit.jupiter.extensions.autodetection.enabled = true
                                     junit.platform.output.capture.stderr = true
                                     junit.platform.output.capture.stdout = true
                                     junit.platform.reporting.open.xml.enabled = true
