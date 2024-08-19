@@ -3,6 +3,8 @@ package wildfly.arquillian;
 import org.jboss.arquillian.config.descriptor.api.ArquillianDescriptor;
 import org.jboss.arquillian.config.descriptor.api.ExtensionDef;
 import org.jboss.arquillian.core.api.annotation.Observes;
+import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.container.ManifestContainer;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -57,12 +59,12 @@ public class JBossXmlProcessor extends AbstractTestArchiveProcessor {
 
     @Override
     public void processClientArchive(JavaArchive clientArchive, Class<?> testClass, URL sunXmlURL) {
-
+        addDescriptors(clientArchive, testClass);
     }
 
     @Override
     public void processWebArchive(WebArchive webArchive, Class<?> testClass, URL sunXmlURL) {
-
+        addDescriptors(webArchive, testClass);
     }
 
     @Override
@@ -77,28 +79,25 @@ public class JBossXmlProcessor extends AbstractTestArchiveProcessor {
 
     @Override
     public void processEarArchive(EnterpriseArchive earArchive, Class<?> testClass, URL sunXmlURL) {
-
+        addDescriptors(earArchive, testClass);
     }
 
     @Override
     public void processEjbArchive(JavaArchive ejbArchive, Class<?> testClass, URL sunXmlURL) {
+        addDescriptors(ejbArchive, testClass);
+    }
+    protected void addDescriptors(ManifestContainer<?> archive, Class<?> testClass) {
         String pkgName = testClass.getPackageName();
         Path pkgPath = Paths.get(pkgName.replace(".", "/"));
         Path descriptorDir = descriptorDirRoot.resolve(pkgPath);
         List<File> files = findJBossDescriptors(descriptorDir);
-        if(!files.isEmpty()) {
-            String archiveName = ejbArchive.getName();
-            for (File f : files) {
-                try {
-                    URL url = f.toURL();
-                    String name = f.getName();
-                    if(name.startsWith(archiveName)) {
-                        String target = name.substring(archiveName.length()+1);
-                        ejbArchive.addAsManifestResource(url, target);
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+        for (File f : files) {
+            try {
+                URL url = f.toURL();
+                String name = f.getName();
+                archive.addAsManifestResource(url, name);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
     }

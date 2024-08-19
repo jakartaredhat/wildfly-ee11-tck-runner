@@ -1,0 +1,148 @@
+wildfly-configuration:
+  subsystem:
+    datasources:
+      jdbc-driver:
+        derby:
+          driver-name: derby
+          driver-xa-datasource-class-name: org.apache.derby.jdbc.ClientXADataSource
+          driver-module-name: org.apache.derby.client
+        derbyEmbedded:
+          driver-name: derbyEmbedded
+          driver-xa-datasource-class-name: org.apache.derby.jdbc.EmbeddedXADataSource
+          driver-module-name: org.apache.derby.embedded
+      data-source:
+        cts-derby-pool:
+          enabled: true
+          jta: true
+          use-java-context: false
+          jndi-name: java:/jdbc/DB1
+          connection-url: 'jdbc:derby://localhost:1527/derbyDB;create=true'
+          driver-class: 'org.apache.derby.jdbc.ClientDriver'
+          driver-name: derby
+          user-name: cts1
+          password: cts1
+          validate-on-match: false
+          background-validation: false
+          use-fast-fail: false
+        cts-derby-notx-pool:
+          enabled: true
+          jta: false
+          use-java-context: false
+          jndi-name: java:/jdbc/DB_no_tx
+          connection-url: 'jdbc:derby://localhost:1527/derbyDB;create=true'
+          driver-class: 'org.apache.derby.jdbc.ClientDriver'
+          driver-name: derby
+          user-name: cts1
+          password: cts1
+          validate-on-match: false
+          background-validation: false
+          use-fast-fail: false
+        cts-timer-pool:
+          enabled: true
+          jta: true
+          use-java-context: false
+          jndi-name: java:/jdbc/DBTimer
+          connection-url: 'jdbc:derby://localhost:1527/derbyDB;create=true'
+          driver-class: 'org.apache.derby.jdbc.ClientDriver'
+          driver-name: derby
+          user-name: cts1
+          password: cts1
+          validate-on-match: false
+          background-validation: false
+          use-fast-fail: false
+        cts-batch-pool:
+          enabled: true
+          jta: true
+          use-java-context: false
+          jndi-name: java:/jdbc/orderDB
+          connection-url: 'jdbc:derby://localhost:1527/derbyDB;create=true'
+          driver-class: 'org.apache.derby.jdbc.ClientDriver'
+          driver-name: derby
+          user-name: cts1
+          password: cts1
+          validate-on-match: false
+          background-validation: false
+          use-fast-fail: false
+        jdbcwb-notx-connection:
+          enabled: true
+          jta: false
+          use-java-context: false
+          jndi-name: java:/eis/JDBCwhitebox-notx
+          connection-url: 'jdbc:derby://localhost:1527/derbyDB;create=true'
+          driver-class: 'org.apache.derby.jdbc.ClientDriver'
+          driver-name: derby
+          user-name: cts1
+          password: cts1
+          validate-on-match: false
+          background-validation: false
+          use-fast-fail: false
+        jdbcwb-tx-connection:
+          enabled: true
+          jta: true
+          use-java-context: false
+          jndi-name: java:/eis/JDBCwhitebox-tx
+          connection-url: 'jdbc:derby://localhost:1527/derbyDB;create=true'
+          driver-class: 'org.apache.derby.jdbc.ClientDriver'
+          driver-name: derby
+          user-name: cts1
+          password: cts1
+          validate-on-match: false
+          background-validation: false
+          use-fast-fail: false
+        cts-securityAPIDB-pool:
+          enabled: true
+          jta: true
+          use-java-context: false
+          jndi-name: java:/jdbc/securityAPIDB
+          connection-url: 'jdbc:derby://localhost:1527/derbyDB;create=true'
+          driver-class: 'org.apache.derby.jdbc.ClientDriver'
+          driver-name: derby
+          user-name: cts1
+          password: cts1
+          validate-on-match: false
+          background-validation: false
+          use-fast-fail: false
+      xa-data-source:
+        cts-derbyEmbedded-pool:
+          jndi-name: 'java:/JavadbXA'
+          driver-name: derby
+          no-recovery: true
+          xa-datasource-properties:
+            ServerName:
+              value: localhost
+            DatabaseName:
+              value: derbyDB
+            User:
+              value: cts1
+            Password:
+              value: cts1
+            CreateDatabase:
+              value: create
+        jdbcwb-xa-connection:
+          jndi-name: 'java:/eis/JDBCwhitebox-xa'
+          driver-name: derby
+          user-name: cts1
+          password: cts1
+          validate-on-match: false
+          background-validation: false
+          use-fast-fail: false
+          xa-datasource-properties:
+            ServerName:
+              value: localhost
+            DatabaseName:
+              value: derbyDB
+            User:
+              value: cts1
+            Password:
+              value: cts1
+            CreateDatabase:
+              value: create
+    ee:
+      global-modules: !list-add
+        - name: org.apache.derby.client
+          slot: main
+        - name: org.apache.derby.embedded
+          slot: main
+      service:
+        default-bindings:
+          datasource: 'java:/jdbc/DB1'
