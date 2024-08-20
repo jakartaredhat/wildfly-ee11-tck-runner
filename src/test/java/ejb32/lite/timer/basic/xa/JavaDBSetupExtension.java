@@ -1,11 +1,9 @@
 package ejb32.lite.timer.basic.xa;
 
 import com.sun.ts.tests.ejb32.lite.timer.basic.xa.XATimerSuite;
-import com.sun.ts.tests.ejb32.lite.timer.basic.xa.ClientEjbliteservletTest;
 import ee.tck.javadb.JavaDBController;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
 
 import java.nio.file.Path;
@@ -16,8 +14,7 @@ import java.util.logging.Logger;
  * Extends the XATimerSuite to start and stop the JavaDB server before and after the suite.
  */
 @Suite
-@SelectClasses({ClientEjbliteservletTest.class})
-public class JavaDBSetupExtension /*extends XATimerSuite*/ implements BeforeAllCallback, ExtensionContext.Store.CloseableResource {
+public class JavaDBSetupExtension extends XATimerSuite implements BeforeAllCallback, ExtensionContext.Store.CloseableResource {
     static Logger log = Logger.getLogger(JavaDBSetupExtension.class.getName());
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws Exception {
