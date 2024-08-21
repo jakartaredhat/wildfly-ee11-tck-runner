@@ -59,12 +59,12 @@ public class JBossXmlProcessor extends AbstractTestArchiveProcessor {
 
     @Override
     public void processClientArchive(JavaArchive clientArchive, Class<?> testClass, URL sunXmlURL) {
-        addDescriptors(clientArchive, testClass);
+        addDescriptors(clientArchive.getName(), clientArchive, testClass);
     }
 
     @Override
     public void processWebArchive(WebArchive webArchive, Class<?> testClass, URL sunXmlURL) {
-        addDescriptors(webArchive, testClass);
+        addDescriptors(webArchive.getName(), webArchive, testClass);
     }
 
     @Override
@@ -79,14 +79,14 @@ public class JBossXmlProcessor extends AbstractTestArchiveProcessor {
 
     @Override
     public void processEarArchive(EnterpriseArchive earArchive, Class<?> testClass, URL sunXmlURL) {
-        addDescriptors(earArchive, testClass);
+        addDescriptors(earArchive.getName(), earArchive, testClass);
     }
 
     @Override
     public void processEjbArchive(JavaArchive ejbArchive, Class<?> testClass, URL sunXmlURL) {
-        addDescriptors(ejbArchive, testClass);
+        addDescriptors(ejbArchive.getName(), ejbArchive, testClass);
     }
-    protected void addDescriptors(ManifestContainer<?> archive, Class<?> testClass) {
+    protected void addDescriptors(String archiveName, ManifestContainer<?> archive, Class<?> testClass) {
         String pkgName = testClass.getPackageName();
         Path pkgPath = Paths.get(pkgName.replace(".", "/"));
         Path descriptorDir = descriptorDirRoot.resolve(pkgPath);
@@ -94,8 +94,10 @@ public class JBossXmlProcessor extends AbstractTestArchiveProcessor {
         for (File f : files) {
             try {
                 URL url = f.toURL();
+                // stateful_migration_threetwo_annotated.ear.jboss-deployment-structure.xml -> jboss-deployment-structure.xml
                 String name = f.getName();
-                archive.addAsManifestResource(url, name);
+                String descriptorName = name.replace(archiveName+".", "");
+                archive.addAsManifestResource(url, descriptorName);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -105,6 +107,7 @@ public class JBossXmlProcessor extends AbstractTestArchiveProcessor {
         try {
             List<File> files = Files.walk(pkgPath, 1)
                     .map(Path::toFile)
+                    .filter(File::isFile)
                     .toList();
             return files;
         } catch (Exception e) {

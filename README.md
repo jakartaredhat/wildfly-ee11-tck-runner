@@ -2,6 +2,7 @@
 An example WildFly runner for the ported EE 11 TCK tests.
 
 So far, there are example runners for:
+- ejb30
 - ejb32
 - jpa
 

@@ -386,6 +386,72 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>ejb30</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <dependenciesToScan>jakarta.tck:ejb30</dependenciesToScan>
+                            <skip>false</skip>
+                            <groups>tck-javatest</groups>
+                            <includes>
+                                <!-- All tests -->
+                                <!--include>com/sun/ts/tests/ejb30/**/*Test.java</include-->
+                                <!-- Examples of single tests -->
+                                <!--include>com/sun/ts/tests/ejb32/lite/timer/basic/sharing/*Test.java</include-->
+                                <!--include>com.sun.ts.tests.ejb30.bb.session.stateful.migration.threetwo.annotated.ClientTest</include-->
+                                <include>com.sun.ts.tests.ejb30.assembly.metainfandlibdir.ClientTest</include>
+                            </includes>
+                            <properties>
+                                <configurationParameters>
+                                    junit.jupiter.extensions.autodetection.enabled = true
+                                    junit.platform.output.capture.stderr = true
+                                    junit.platform.output.capture.stdout = true
+                                    junit.platform.reporting.open.xml.enabled = true
+                                    junit.platform.reporting.output.dir = target/junit5-reports
+                                </configurationParameters>
+                            </properties>
+                            <systemPropertyVariables>
+                                <arquillian.xml>javatest-arquillian.xml</arquillian.xml>
+                                <ts.home>${ts.home}</ts.home>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>ejb30-appclient</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <dependenciesToScan>jakarta.tck:ejb30</dependenciesToScan>
+                            <skip>false</skip>
+                            <groups>tck-appclient</groups>
+                            <includes>
+                                <!-- All tests -->
+                                <!--include>com/sun/ts/tests/ejb30/**/*Test.java</include-->
+                                <!-- Examples of single tests -->
+                                <!--include>com/sun/ts/tests/ejb32/lite/timer/basic/sharing/*Test.java</include-->
+                                <include>com.sun.ts.tests.ejb30.bb.session.stateful.migration.threetwo.annotated.ClientTest</include>
+                            </includes>
+                            <properties>
+                                <configurationParameters>
+                                    junit.jupiter.extensions.autodetection.enabled = true
+                                    junit.platform.output.capture.stderr = true
+                                    junit.platform.output.capture.stdout = true
+                                    junit.platform.reporting.open.xml.enabled = true
+                                    junit.platform.reporting.output.dir = target/junit5-reports
+                                </configurationParameters>
+                            </properties>
+                            <systemPropertyVariables>
+                                <arquillian.xml>javatest-appclient-arquillian.xml</arquillian.xml>
+                                <ts.home>${ts.home}</ts.home>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+
+                    <execution>
                         <id>ejb32</id>
                         <phase>test</phase>
                         <goals>

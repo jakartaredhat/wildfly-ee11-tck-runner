@@ -21,6 +21,10 @@
     <engine>
         <property name="deploymentExportPath">target/deployments</property>
     </engine>
+    <extension qualifier="jboss-descriptors">
+        <property name="descriptorDir">/home/starksm/Dev/Jakarta/wildflytck-new/cts-10-mods/output/classes</property>
+    </extension>
+
     <container qualifier="tck-appclient" default="true">
         <configuration>
             <property name="jbossHome">${jboss.home}</property>
