@@ -3,7 +3,16 @@ An example WildFly runner for the ported EE 11 TCK tests.
 
 So far, there are example runners for:
 - ejb32
+- jpa
 
+Each tck module has its own execution section with the id set to the module name. To run a single test module, use `mvn surefire:test@<module-name>`. For example, to run the JPA tests, use:
+
+```shell
+mvn surefire:test@jpa
+mvn surefire:test@jpa -Dtest=org.jboss.spec.javax.persistence.jpa.test.criteria.CriteriaQueryTest
+
+```
+The second command runs a single test class from the JPA module.
 
 ## Running the test using mvn
 From the command line run `mvn test`
