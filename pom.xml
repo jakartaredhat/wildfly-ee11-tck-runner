@@ -430,7 +430,7 @@
                         </goals>
                         <configuration>
                             <dependenciesToScan>
-                                <dependency>jakarta.tck:persistence-platform-tck</dependency>
+                                <dependency>jakarta.tck:persistence-platform-tck-tests</dependency>
                             </dependenciesToScan>
                             <skip>false</skip>
                             <groups>tck-javatest</groups>
