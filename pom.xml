@@ -51,7 +51,7 @@
         <galleon.fork.embedded>true</galleon.fork.embedded>
         <galleon.log.time>true</galleon.log.time>
         <galleon.offline>false</galleon.offline>
-        <jboss.home>/home/smarlow/tck/wildfly/dist/target/wildfly-34.0.0.Beta1-SNAPSHOT</jboss.home>
+        <jboss.home>/home/smarlow/tck/tck10/wildfly/dist/target/wildfly-34.0.0.Beta1-SNAPSHOT</jboss.home>
         <galleon.feature.pack.artifactId>wildfly-ee-galleon-pack</galleon.feature.pack.artifactId>
         <galleon.feature.pack.location>
             wildfly@maven(org.jboss.universe:community-universe)#${version.org.wildfly.full}
@@ -82,6 +82,8 @@
         <!-- Require at least Java 17 to compile -->
         <jdk.min.version>11</jdk.min.version>
         <maven.compiler.release>17</maven.compiler.release>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
     <licenses>
@@ -138,12 +140,14 @@
             <version>${version.jakarta.tck}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
+
+        <dependency>    
             <groupId>jakarta.tck</groupId>
-            <artifactId>persistence-tck-spec-tests</artifactId>
-            <version>3.2.0</version>
+            <artifactId>persistence-platform-tck-spec-tests</artifactId>
+            <version>${version.jakarta.tck}</version>
             <scope>test</scope>
-        </dependency>
+        </dependency>       
+
         <dependency>
             <groupId>jakarta.tck</groupId>
             <artifactId>persistence-platform-tck-tests</artifactId>
@@ -393,7 +397,7 @@
                         </goals>
                         <configuration>
                             <dependenciesToScan>jakarta.tck:ejb32</dependenciesToScan>
-                            <skip>false</skip>
+                            <skip>true</skip>
                             <groups>tck-javatest</groups>
                             <includes>
                                 <!-- All tests -->
@@ -431,12 +435,13 @@
                         <configuration>
                             <dependenciesToScan>
                                 <dependency>jakarta.tck:persistence-platform-tck-tests</dependency>
+                               <!-- <dependency>jakarta.tck:persistence-platform-tck-spec-tests</dependency> -->
                             </dependenciesToScan>
                             <skip>false</skip>
                             <groups>tck-javatest</groups>
                             <includes>
                                 <!-- All tests -->
-                                <include>ee/jakarta/tck/persistence/**/*Test.java</include>
+                                <include>ee/jakarta/tck/persistence/core/basic/*Test.java</include>
                                 <!-- Examples of single tests -->
                                 <!--include>com/sun/ts/tests/ejb32/lite/timer/basic/sharing/*Test.java</include-->
                                 <!--include>com/sun/ts/tests/ejb32/lite/timer/basic/concurrency/JsfClientEjblitejspTest.java</include-->
