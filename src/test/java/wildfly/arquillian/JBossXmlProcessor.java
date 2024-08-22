@@ -111,7 +111,11 @@ public class JBossXmlProcessor extends AbstractTestArchiveProcessor {
                 URL url = f.toURL();
                 // stateful_migration_threetwo_annotated.ear.jboss-deployment-structure.xml -> jboss-deployment-structure.xml
                 String descriptorName = name.replace(archiveName+".", "");
-                archive.addAsManifestResource(url, descriptorName);
+                if(archive instanceof WebArchive webArchive) {
+                    webArchive.addAsWebInfResource(url, descriptorName);
+                } else {
+                    archive.addAsManifestResource(url, descriptorName);
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
