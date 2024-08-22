@@ -59,12 +59,14 @@ public class JBossXmlProcessor extends AbstractTestArchiveProcessor {
 
     @Override
     public void processClientArchive(JavaArchive clientArchive, Class<?> testClass, URL sunXmlURL) {
-        addDescriptors(clientArchive.getName(), clientArchive, testClass);
+        String name = clientArchive.getName();
+        addDescriptors(name, clientArchive, testClass);
     }
 
     @Override
     public void processWebArchive(WebArchive webArchive, Class<?> testClass, URL sunXmlURL) {
-        addDescriptors(webArchive.getName(), webArchive, testClass);
+        String name = webArchive.getName();
+        addDescriptors(name, webArchive, testClass);
     }
 
     @Override
@@ -79,23 +81,35 @@ public class JBossXmlProcessor extends AbstractTestArchiveProcessor {
 
     @Override
     public void processEarArchive(EnterpriseArchive earArchive, Class<?> testClass, URL sunXmlURL) {
-        addDescriptors(earArchive.getName(), earArchive, testClass);
+        String name = earArchive.getName();
+        addDescriptors(name, earArchive, testClass);
     }
 
     @Override
     public void processEjbArchive(JavaArchive ejbArchive, Class<?> testClass, URL sunXmlURL) {
-        addDescriptors(ejbArchive.getName(), ejbArchive, testClass);
+        String name = ejbArchive.getName();
+        addDescriptors(name, ejbArchive, testClass);
     }
+
+    /**
+     *
+     * @param archiveName
+     * @param archive
+     * @param testClass
+     */
     protected void addDescriptors(String archiveName, ManifestContainer<?> archive, Class<?> testClass) {
         String pkgName = testClass.getPackageName();
         Path pkgPath = Paths.get(pkgName.replace(".", "/"));
         Path descriptorDir = descriptorDirRoot.resolve(pkgPath);
         List<File> files = findJBossDescriptors(descriptorDir);
         for (File f : files) {
+            String name = f.getName();
+            if(!name.startsWith(archiveName)) {
+                continue;
+            }
             try {
                 URL url = f.toURL();
                 // stateful_migration_threetwo_annotated.ear.jboss-deployment-structure.xml -> jboss-deployment-structure.xml
-                String name = f.getName();
                 String descriptorName = name.replace(archiveName+".", "");
                 archive.addAsManifestResource(url, descriptorName);
             } catch (IOException e) {
