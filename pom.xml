@@ -45,13 +45,13 @@
         <version.jakarta.tck.arquillian>1.0.0-M10</version.jakarta.tck.arquillian>
         <version.org.wildfly.checkstyle-config>1.0.8.Final</version.org.wildfly.checkstyle-config>
         <!-- TCK properties -->
-        <ts.home>/home/starksm/Dev/Jakarta/wildflytck-new/jakartaeetck</ts.home>
+        <ts.home>/Users/starksm/Dev/Jakarta/wildflytck/jakartaeetck</ts.home>
 
         <!-- Galleon -->
         <galleon.fork.embedded>true</galleon.fork.embedded>
         <galleon.log.time>true</galleon.log.time>
         <galleon.offline>false</galleon.offline>
-        <jboss.home>/home/starksm/Dev/Jakarta/wildflytck-new/wildfly/dist/target/wildfly-33.0.0.Beta1-SNAPSHOT</jboss.home>
+        <jboss.home>/Users/starksm/Dev/Jakarta/wildflytck/wildfly-33.0.0.Beta1-SNAPSHOT</jboss.home>
         <galleon.feature.pack.artifactId>wildfly-ee-galleon-pack</galleon.feature.pack.artifactId>
         <galleon.feature.pack.location>
             wildfly@maven(org.jboss.universe:community-universe)#${version.org.wildfly.full}
@@ -140,8 +140,8 @@
         </dependency>
         <dependency>
             <groupId>jakarta.tck</groupId>
-            <artifactId>persistence-tck-spec-tests</artifactId>
-            <version>3.2.0</version>
+            <artifactId>persistence-platform-tck-spec-tests</artifactId>
+            <version>${version.jakarta.tck}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -407,7 +407,7 @@
                             <groups>tck-javatest</groups>
                             <includes>
                                 <!-- All tests -->
-                                <!--include>com/sun/ts/tests/ejb30/**/*Test.java</include-->
+                                <include>com/sun/ts/tests/ejb30/**/*Test.java</include>
                                 <!-- Examples of single tests -->
                                 <!--include>com/sun/ts/tests/ejb30/lite/tx/cm/singleton/rw/*Test.java</include-->
                                 <include>com/sun/ts/tests/ejb30/timer/**/*Test.java</include>
@@ -511,7 +511,7 @@
                             <groups>tck-javatest</groups>
                             <includes>
                                 <!-- All tests -->
-                                <include>ee/jakarta/tck/persistence/**/*Test.java</include>
+                                <!--include>ee/jakarta/tck/persistence/**/*Test.java</include-->
                                 <!-- Examples of single tests -->
                                 <!--include>com/sun/ts/tests/ejb32/lite/timer/basic/sharing/*Test.java</include-->
                                 <!--include>com/sun/ts/tests/ejb32/lite/timer/basic/concurrency/JsfClientEjblitejspTest.java</include-->
@@ -519,7 +519,7 @@
                                 <!--include>com.sun.ts.tests.ejb32.lite.timer.basic.xa.ClientEjbliteservletTest</include-->
                                 <!--include>com/sun/ts/tests/ejb32/lite/timer/basic/*Test.java</include-->
                                 <!--include>com.sun.ts.tests.ejb32.lite.timer.basic.xa.XATimerSuite</include-->
-                                <!--include>ejb32.lite.timer.basic.xa.JavaDBSetupExtension</include -->
+                                <include>ee.jakarta.tck.persistence.core.basic.ClientPuservletTest</include>
                             </includes>
                             <properties>
                                 <configurationParameters>
