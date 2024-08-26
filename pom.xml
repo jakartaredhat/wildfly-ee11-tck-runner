@@ -45,13 +45,13 @@
         <version.jakarta.tck.arquillian>1.0.0-M10</version.jakarta.tck.arquillian>
         <version.org.wildfly.checkstyle-config>1.0.8.Final</version.org.wildfly.checkstyle-config>
         <!-- TCK properties -->
-        <ts.home>/Users/starksm/Dev/Jakarta/wildflytck/jakartaeetck</ts.home>
+        <ts.home>${env.TS_HOME}</ts.home>
 
         <!-- Galleon -->
         <galleon.fork.embedded>true</galleon.fork.embedded>
         <galleon.log.time>true</galleon.log.time>
         <galleon.offline>false</galleon.offline>
-        <jboss.home>/Users/starksm/Dev/Jakarta/wildflytck/wildfly-33.0.0.Beta1-SNAPSHOT</jboss.home>
+        <jboss.home>${env.TS_HOME}/../wildfly/dist/target/wildfly-33.0.0.Beta1-SNAPSHOT</jboss.home>
         <galleon.feature.pack.artifactId>wildfly-ee-galleon-pack</galleon.feature.pack.artifactId>
         <galleon.feature.pack.location>
             wildfly@maven(org.jboss.universe:community-universe)#${version.org.wildfly.full}
@@ -353,7 +353,12 @@
             <version>${version.org.jboss.shrinkwrap.descriptors}</version>
         </dependency>
 
-
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 
@@ -407,10 +412,10 @@
                             <groups>tck-javatest</groups>
                             <includes>
                                 <!-- All tests -->
-                                <include>com/sun/ts/tests/ejb30/**/*Test.java</include>
+                                <!--include>com/sun/ts/tests/ejb30/**/*Test.java</include-->
                                 <!-- Examples of single tests -->
                                 <!--include>com/sun/ts/tests/ejb30/lite/tx/cm/singleton/rw/*Test.java</include-->
-                                <include>com/sun/ts/tests/ejb30/timer/**/*Test.java</include>
+                                <include>com.sun.ts.tests.ejb30.lite.enventry.stateless.ClientEjbliteservletTest</include>
                             </includes>
                             <properties>
                                 <configurationParameters>
@@ -442,7 +447,6 @@
                                 <!--include>com/sun/ts/tests/ejb30/**/*Test.java</include-->
                                 <!-- Examples of single tests -->
                                 <!--include>com/sun/ts/tests/ejb32/lite/timer/basic/sharing/*Test.java</include-->
-                                <include>com.sun.ts.tests.ejb30.bb.session.stateful.migration.threetwo.annotated.ClientTest</include>
                             </includes>
                             <properties>
                                 <configurationParameters>
@@ -497,6 +501,40 @@
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
+
+                    <execution>
+                        <id>jms</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <dependenciesToScan>jakarta.tck:jms</dependenciesToScan>
+                            <skip>false</skip>
+                            <groups>tck-javatest</groups>
+                            <includes>
+                                <!-- All tests -->
+                                <include>com/sun/ts/tests/jms/**/*Test.java</include>
+                                <!-- Examples of single tests -->
+                                <!--include>com.sun.ts.tests.jms.core.bytesMsgTopic.BytesMsgTopicTestsJspTest</include-->
+                            </includes>
+                            <properties>
+                                <configurationParameters>
+                                    junit.jupiter.extensions.autodetection.enabled = true
+                                    junit.platform.output.capture.stderr = true
+                                    junit.platform.output.capture.stdout = true
+                                    junit.platform.reporting.open.xml.enabled = false
+                                    junit.platform.reporting.output.dir = target/junit5-reports
+                                </configurationParameters>
+                            </properties>
+                            <systemPropertyVariables>
+                                <arquillian.xml>javatest-arquillian.xml</arquillian.xml>
+                                <ts.home>${ts.home}</ts.home>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+
+
                     <execution>
                         <id>jpa</id>
                         <phase>test</phase>
@@ -513,13 +551,7 @@
                                 <!-- All tests -->
                                 <!--include>ee/jakarta/tck/persistence/**/*Test.java</include-->
                                 <!-- Examples of single tests -->
-                                <!--include>com/sun/ts/tests/ejb32/lite/timer/basic/sharing/*Test.java</include-->
-                                <!--include>com/sun/ts/tests/ejb32/lite/timer/basic/concurrency/JsfClientEjblitejspTest.java</include-->
-                                <!--include>com.sun.ts.tests.ejb32.timer.service.stateless.ClientEjbliteservletTest</include-->
-                                <!--include>com.sun.ts.tests.ejb32.lite.timer.basic.xa.ClientEjbliteservletTest</include-->
-                                <!--include>com/sun/ts/tests/ejb32/lite/timer/basic/*Test.java</include-->
-                                <!--include>com.sun.ts.tests.ejb32.lite.timer.basic.xa.XATimerSuite</include-->
-                                <include>ee.jakarta.tck.persistence.core.basic.ClientPuservletTest</include>
+                                <include>ee.jakarta.tck.persistence.core.basic.ClientPmservletTest</include>
                             </includes>
                             <properties>
                                 <configurationParameters>

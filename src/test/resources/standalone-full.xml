@@ -1,0 +1,736 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<server xmlns="urn:jboss:domain:20.0">
+    <extensions>
+        <extension module="org.jboss.as.clustering.infinispan"/>
+        <extension module="org.jboss.as.connector"/>
+        <extension module="org.jboss.as.deployment-scanner"/>
+        <extension module="org.jboss.as.ee"/>
+        <extension module="org.jboss.as.ejb3"/>
+        <extension module="org.jboss.as.jaxrs"/>
+        <extension module="org.jboss.as.jdr"/>
+        <extension module="org.jboss.as.jmx"/>
+        <extension module="org.jboss.as.jpa"/>
+        <extension module="org.jboss.as.jsf"/>
+        <extension module="org.jboss.as.logging"/>
+        <extension module="org.jboss.as.mail"/>
+        <extension module="org.jboss.as.naming"/>
+        <extension module="org.jboss.as.pojo"/>
+        <extension module="org.jboss.as.remoting"/>
+        <extension module="org.jboss.as.sar"/>
+        <extension module="org.jboss.as.transactions"/>
+        <extension module="org.jboss.as.webservices"/>
+        <extension module="org.jboss.as.weld"/>
+        <extension module="org.wildfly.extension.batch.jberet"/>
+        <extension module="org.wildfly.extension.bean-validation"/>
+        <extension module="org.wildfly.extension.clustering.ejb"/>
+        <extension module="org.wildfly.extension.clustering.web"/>
+        <extension module="org.wildfly.extension.core-management"/>
+        <extension module="org.wildfly.extension.discovery"/>
+        <extension module="org.wildfly.extension.ee-security"/>
+        <extension module="org.wildfly.extension.elytron"/>
+        <extension module="org.wildfly.extension.elytron-oidc-client"/>
+        <extension module="org.wildfly.extension.health"/>
+        <extension module="org.wildfly.extension.io"/>
+        <extension module="org.wildfly.extension.messaging-activemq"/>
+        <extension module="org.wildfly.extension.metrics"/>
+        <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
+        <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
+        <extension module="org.wildfly.extension.request-controller"/>
+        <extension module="org.wildfly.extension.security.manager"/>
+        <extension module="org.wildfly.extension.undertow"/>
+        <extension module="org.wildfly.iiop-openjdk"/>
+    </extensions>
+    <management>
+        <audit-log>
+            <formatters>
+                <json-formatter name="json-formatter"/>
+            </formatters>
+            <handlers>
+                <file-handler name="file" formatter="json-formatter" path="audit-log.log" relative-to="jboss.server.data.dir"/>
+            </handlers>
+            <logger log-boot="true" log-read-only="false" enabled="false">
+                <handlers>
+                    <handler name="file"/>
+                </handlers>
+            </logger>
+        </audit-log>
+        <management-interfaces>
+            <http-interface http-authentication-factory="management-http-authentication">
+                <http-upgrade enabled="true" sasl-authentication-factory="management-sasl-authentication"/>
+                <socket-binding http="management-http"/>
+            </http-interface>
+        </management-interfaces>
+        <access-control provider="simple">
+            <role-mapping>
+                <role name="SuperUser">
+                    <include>
+                        <user name="$local"/>
+                    </include>
+                </role>
+            </role-mapping>
+        </access-control>
+    </management>
+    <profile>
+        <subsystem xmlns="urn:jboss:domain:logging:8.0">
+            <console-handler name="CONSOLE">
+                <level name="INFO"/>
+                <formatter>
+                    <named-formatter name="COLOR-PATTERN"/>
+                </formatter>
+            </console-handler>
+            <periodic-rotating-file-handler name="FILE" autoflush="true">
+                <formatter>
+                    <named-formatter name="PATTERN"/>
+                </formatter>
+                <file relative-to="jboss.server.log.dir" path="server.log"/>
+                <suffix value=".yyyy-MM-dd"/>
+                <append value="true"/>
+            </periodic-rotating-file-handler>
+            <logger category="com.arjuna">
+                <level name="WARN"/>
+            </logger>
+            <logger category="com.networknt.schema">
+                <level name="WARN"/>
+            </logger>
+            <logger category="io.jaegertracing.Configuration">
+                <level name="WARN"/>
+            </logger>
+            <logger category="org.jboss.as.config">
+                <level name="DEBUG"/>
+            </logger>
+            <logger category="org.jboss.weld">
+                <level name="DEBUG"/>
+            </logger>
+            <logger category="sun.rmi">
+                <level name="WARN"/>
+            </logger>
+            <root-logger>
+                <level name="INFO"/>
+                <handlers>
+                    <handler name="CONSOLE"/>
+                    <handler name="FILE"/>
+                </handlers>
+            </root-logger>
+            <formatter name="PATTERN">
+                <pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"/>
+            </formatter>
+            <formatter name="COLOR-PATTERN">
+                <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"/>
+            </formatter>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:batch-jberet:3.0">
+            <default-job-repository name="in-memory"/>
+            <default-thread-pool name="batch"/>
+            <security-domain name="ApplicationDomain"/>
+            <job-repository name="in-memory">
+                <in-memory/>
+            </job-repository>
+            <thread-pool name="batch">
+                <max-threads count="10"/>
+                <keepalive-time time="30" unit="seconds"/>
+            </thread-pool>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:bean-validation:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:datasources:7.1">
+            <datasources>
+                <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
+                    <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=${wildfly.h2.compatibility.mode:REGULAR}</connection-url>
+                    <driver>h2</driver>
+                    <security user-name="sa" password="sa"/>
+                </datasource>
+                <drivers>
+                    <driver name="h2" module="com.h2database.h2">
+                        <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
+                    </driver>
+                </drivers>
+            </datasources>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:deployment-scanner:2.0">
+            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" runtime-failure-causes-rollback="${jboss.deployment.scanner.rollback.on.failure:false}"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:discovery:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:distributable-ejb:1.0" default-bean-management="default">
+            <infinispan-bean-management name="default" max-active-beans="10000" cache-container="ejb" cache="passivation"/>
+            <local-client-mappings-registry/>
+            <infinispan-timer-management name="persistent" cache-container="ejb" cache="persistent" max-active-timers="10000"/>
+            <infinispan-timer-management name="transient" cache-container="ejb" cache="transient" max-active-timers="10000"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:distributable-web:4.0" default-session-management="default" default-single-sign-on-management="default">
+            <infinispan-session-management name="default" cache-container="web" granularity="SESSION">
+                <local-affinity/>
+            </infinispan-session-management>
+            <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
+            <local-routing/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:ee:6.0">
+            <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
+            <concurrent>
+                <context-services>
+                    <context-service name="default" jndi-name="java:jboss/ee/concurrency/context/default"/>
+                </context-services>
+                <managed-thread-factories>
+                    <managed-thread-factory name="default" jndi-name="java:jboss/ee/concurrency/factory/default" context-service="default"/>
+                </managed-thread-factories>
+                <managed-executor-services>
+                    <managed-executor-service name="default" jndi-name="java:jboss/ee/concurrency/executor/default" context-service="default" hung-task-termination-period="0" hung-task-threshold="60000" keepalive-time="5000"/>
+                </managed-executor-services>
+                <managed-scheduled-executor-services>
+                    <managed-scheduled-executor-service name="default" jndi-name="java:jboss/ee/concurrency/scheduler/default" context-service="default" hung-task-termination-period="0" hung-task-threshold="60000" keepalive-time="3000"/>
+                </managed-scheduled-executor-services>
+            </concurrent>
+            <default-bindings context-service="java:jboss/ee/concurrency/context/default" datasource="java:jboss/datasources/ExampleDS" jms-connection-factory="java:jboss/DefaultJMSConnectionFactory" managed-executor-service="java:jboss/ee/concurrency/executor/default" managed-scheduled-executor-service="java:jboss/ee/concurrency/scheduler/default" managed-thread-factory="java:jboss/ee/concurrency/factory/default"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:ee-security:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:ejb3:10.0">
+            <session-bean>
+                <stateless>
+                    <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
+                </stateless>
+                <stateful default-access-timeout="5000" cache-ref="simple" passivation-disabled-cache-ref="simple"/>
+                <singleton default-access-timeout="5000"/>
+            </session-bean>
+            <mdb>
+                <resource-adapter-ref resource-adapter-name="${ejb.resource-adapter-name:activemq-ra.rar}"/>
+                <bean-instance-pool-ref pool-name="mdb-strict-max-pool"/>
+            </mdb>
+            <pools>
+                <bean-instance-pools>
+                    <strict-max-pool name="slsb-strict-max-pool" derive-size="from-worker-pools" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
+                    <strict-max-pool name="mdb-strict-max-pool" derive-size="from-cpu-count" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
+                </bean-instance-pools>
+            </pools>
+            <caches>
+                <simple-cache name="simple"/>
+                <distributable-cache name="distributable"/>
+            </caches>
+            <async thread-pool-name="default"/>
+            <timer-service thread-pool-name="default" default-data-store="default-file-store">
+                <data-stores>
+                    <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
+                </data-stores>
+            </timer-service>
+            <remote connectors="http-remoting-connector" thread-pool-name="default">
+                <channel-creation-options>
+                    <option name="MAX_OUTBOUND_MESSAGES" value="1234" type="remoting"/>
+                </channel-creation-options>
+            </remote>
+            <thread-pools>
+                <thread-pool name="default">
+                    <max-threads count="10"/>
+                    <keepalive-time time="60" unit="seconds"/>
+                </thread-pool>
+            </thread-pools>
+            <iiop enable-by-default="false" use-qualified-name="false"/>
+            <default-security-domain value="other"/>
+            <application-security-domains>
+                <application-security-domain name="other" security-domain="ApplicationDomain"/>
+            </application-security-domains>
+            <default-missing-method-permissions-deny-access value="true"/>
+            <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
+            <log-system-exceptions value="true"/>
+        </subsystem>
+        <subsystem xmlns="urn:wildfly:elytron:community:18.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <providers>
+                <aggregate-providers name="combined-providers">
+                    <providers name="elytron"/>
+                    <providers name="openssl"/>
+                </aggregate-providers>
+                <provider-loader name="elytron" module="org.wildfly.security.elytron"/>
+                <provider-loader name="openssl" module="org.wildfly.openssl"/>
+            </providers>
+            <audit-logging>
+                <file-audit-log name="local-audit" path="audit.log" relative-to="jboss.server.log.dir" format="JSON"/>
+            </audit-logging>
+            <security-domains>
+                <security-domain name="ApplicationDomain" default-realm="ApplicationRealm" permission-mapper="default-permission-mapper">
+                    <realm name="ApplicationRealm" role-decoder="groups-to-roles"/>
+                    <realm name="local"/>
+                </security-domain>
+                <security-domain name="ManagementDomain" default-realm="ManagementRealm" permission-mapper="default-permission-mapper">
+                    <realm name="ManagementRealm" role-decoder="groups-to-roles"/>
+                    <realm name="local" role-mapper="super-user-mapper"/>
+                </security-domain>
+                <security-domain name="messaging" default-realm="CtsCommonRealm" permission-mapper="cts-permissions-mapper">
+                    <realm name="CtsCommonRealm" role-decoder="groups-to-roles"/>
+                    <realm name="cts-unauthenticated" role-mapper="cts-user-mapper"/>
+                </security-domain>
+            </security-domains>
+            <security-realms>
+                <identity-realm name="local" identity="$local"/>
+                <identity-realm name="cts-unauthenticated" identity="cts-user"/>
+                
+                <properties-realm name="CtsCommonRealm">
+                    <users-properties path="./security/cts-users.properties" relative-to="jboss.server.config.dir" digest-realm-name="CtsRealm" plain-text="true" />
+                    <groups-properties path="./security/cts-roles.properties" relative-to="jboss.server.config.dir"/>
+                </properties-realm>
+                <properties-realm name="ApplicationRealm">
+                    <users-properties path="application-users.properties" relative-to="jboss.server.config.dir" digest-realm-name="ApplicationRealm"/>
+                    <groups-properties path="application-roles.properties" relative-to="jboss.server.config.dir"/>
+                </properties-realm>
+                <properties-realm name="ManagementRealm">
+                    <users-properties path="mgmt-users.properties" relative-to="jboss.server.config.dir" digest-realm-name="ManagementRealm"/>
+                    <groups-properties path="mgmt-groups.properties" relative-to="jboss.server.config.dir"/>
+                </properties-realm>
+            </security-realms>
+            <mappers>
+                <simple-permission-mapper name="default-permission-mapper" mapping-mode="first">
+                    <permission-mapping>
+                        <principal name="anonymous"/>
+                        <permission-set name="default-permissions"/>
+                    </permission-mapping>
+                    <permission-mapping match-all="true">
+                        <permission-set name="login-permission"/>
+                        <permission-set name="default-permissions"/>
+                    </permission-mapping>
+                </simple-permission-mapper>
+                <constant-realm-mapper name="local" realm-name="local"/>
+                <simple-role-decoder name="groups-to-roles" attribute="groups"/>
+                <constant-role-mapper name="super-user-mapper">
+                    <role name="SuperUser"/>
+                </constant-role-mapper>
+                <constant-role-mapper name="cts-user-mapper">
+                    <role name="guest"/>
+                </constant-role-mapper>
+                
+                <constant-permission-mapper name="cts-permissions-mapper">
+                  <permission  class-name="org.wildfly.security.auth.permission.LoginPermission" />
+                  <permission  class-name="org.wildfly.extension.batch.jberet.deployment.BatchPermission" module="org.wildfly.extension.batch.jberet" target-name="*" />
+                  <permission  class-name="org.wildfly.transaction.client.RemoteTransactionPermission" module="org.wildfly.transaction.client" />
+                  <!--permission  class-name="org.jboss.ejb.client.RemoteEJBPermission" module="org.jboss-ejb-client" /-->
+                  <permission  class-name="org.wildfly.security.auth.permission.RunAsPrincipalPermission" target-name="*" />
+                </constant-permission-mapper>
+            </mappers>
+            <permission-sets>
+                <permission-set name="login-permission">
+                    <permission class-name="org.wildfly.security.auth.permission.LoginPermission"/>
+                </permission-set>
+                <permission-set name="default-permissions">
+                    <permission class-name="org.wildfly.transaction.client.RemoteTransactionPermission" module="org.wildfly.transaction.client"/>
+                    <permission class-name="org.jboss.ejb.client.RemoteEJBPermission" module="org.jboss.ejb-client"/>
+                    <permission class-name="org.wildfly.extension.batch.jberet.deployment.BatchPermission" module="org.wildfly.extension.batch.jberet" target-name="*"/>
+                </permission-set>
+            </permission-sets>
+            <http>
+                <http-authentication-factory name="application-http-authentication" security-domain="ApplicationDomain" http-server-mechanism-factory="global">
+                    <mechanism-configuration>
+                        <mechanism mechanism-name="BASIC">
+                            <mechanism-realm realm-name="ApplicationRealm"/>
+                        </mechanism>
+                    </mechanism-configuration>
+                </http-authentication-factory>
+                <http-authentication-factory name="management-http-authentication" security-domain="ManagementDomain" http-server-mechanism-factory="global">
+                    <mechanism-configuration>
+                        <mechanism mechanism-name="DIGEST">
+                            <mechanism-realm realm-name="ManagementRealm"/>
+                        </mechanism>
+                    </mechanism-configuration>
+                </http-authentication-factory>
+                <provider-http-server-mechanism-factory name="global"/>
+            </http>
+            <sasl>
+                <sasl-authentication-factory name="application-sasl-authentication" sasl-server-factory="configured" security-domain="ApplicationDomain">
+                    <mechanism-configuration>
+                        <mechanism mechanism-name="JBOSS-LOCAL-USER" realm-mapper="local"/>
+                        <mechanism mechanism-name="DIGEST-MD5">
+                            <mechanism-realm realm-name="ApplicationRealm"/>
+                        </mechanism>
+                    </mechanism-configuration>
+                </sasl-authentication-factory>
+                <sasl-authentication-factory name="management-sasl-authentication" sasl-server-factory="configured" security-domain="ManagementDomain">
+                    <mechanism-configuration>
+                        <mechanism mechanism-name="JBOSS-LOCAL-USER" realm-mapper="local"/>
+                        <mechanism mechanism-name="DIGEST-MD5">
+                            <mechanism-realm realm-name="ManagementRealm"/>
+                        </mechanism>
+                    </mechanism-configuration>
+                </sasl-authentication-factory>
+                <configurable-sasl-server-factory name="configured" sasl-server-factory="elytron">
+                    <properties>
+                        <property name="wildfly.sasl.local-user.default-user" value="$local"/>
+                        <property name="wildfly.sasl.local-user.challenge-path" value="${jboss.server.temp.dir}/auth"/>
+                    </properties>
+                </configurable-sasl-server-factory>
+                <mechanism-provider-filtering-sasl-server-factory name="elytron" sasl-server-factory="global">
+                    <filters>
+                        <filter provider-name="WildFlyElytron"/>
+                    </filters>
+                </mechanism-provider-filtering-sasl-server-factory>
+                <provider-sasl-server-factory name="global"/>
+            </sasl>
+            <tls>
+                <key-stores>
+                    <key-store name="applicationKS">
+                        <credential-reference clear-text="password"/>
+                        <implementation type="JKS"/>
+                        <file path="application.keystore" relative-to="jboss.server.config.dir"/>
+                    </key-store>
+                </key-stores>
+                <key-managers>
+                    <key-manager name="applicationKM" key-store="applicationKS" generate-self-signed-certificate-host="localhost">
+                        <credential-reference clear-text="password"/>
+                    </key-manager>
+                </key-managers>
+                <server-ssl-contexts>
+                    <server-ssl-context name="applicationSSC" key-manager="applicationKM"/>
+                </server-ssl-contexts>
+            </tls>
+            <policy name="jacc">
+                <jacc-policy/>
+            </policy>
+        </subsystem>
+        <subsystem xmlns="urn:wildfly:elytron-oidc-client:2.0"/>
+        <subsystem xmlns="urn:wildfly:health:1.0" security-enabled="false"/>
+        <subsystem xmlns="urn:jboss:domain:iiop-openjdk:3.0">
+            <orb socket-binding="iiop"/>
+            <initializers security="elytron" transactions="spec"/>
+            <security server-requires-ssl="false" client-requires-ssl="false"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:infinispan:14.0">
+            <cache-container name="hibernate" marshaller="JBOSS" modules="org.infinispan.hibernate-cache">
+                <local-cache name="entity">
+                    <heap-memory size="10000"/>
+                    <expiration max-idle="100000"/>
+                </local-cache>
+                <local-cache name="local-query">
+                    <heap-memory size="10000"/>
+                    <expiration max-idle="100000"/>
+                </local-cache>
+                <local-cache name="timestamps">
+                    <expiration interval="0"/>
+                </local-cache>
+                <local-cache name="pending-puts">
+                    <expiration max-idle="60000"/>
+                </local-cache>
+            </cache-container>
+            <cache-container name="ejb" default-cache="passivation" marshaller="PROTOSTREAM" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
+                <local-cache name="passivation">
+                    <expiration interval="0"/>
+                    <file-store passivation="true"/>
+                </local-cache>
+                <local-cache name="persistent">
+                    <locking isolation="REPEATABLE_READ"/>
+                    <transaction mode="BATCH"/>
+                    <expiration interval="0"/>
+                    <file-store preload="true"/>
+                </local-cache>
+                <local-cache name="transient">
+                    <locking isolation="REPEATABLE_READ"/>
+                    <transaction mode="BATCH"/>
+                    <expiration interval="0"/>
+                    <file-store passivation="true" purge="true"/>
+                </local-cache>
+            </cache-container>
+            <cache-container name="web" default-cache="passivation" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.web.infinispan">
+                <local-cache name="passivation">
+                    <expiration interval="0"/>
+                    <file-store passivation="true"/>
+                </local-cache>
+                <local-cache name="sso">
+                    <expiration interval="0"/>
+                </local-cache>
+            </cache-container>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:io:4.0" default-worker="default">
+            <worker name="default"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:jaxrs:3.0"/>
+        <subsystem xmlns="urn:jboss:domain:jca:6.0">
+            <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
+            <bean-validation enabled="true"/>
+            <default-workmanager>
+                <short-running-threads>
+                    <core-threads count="50"/>
+                    <queue-length count="50"/>
+                    <max-threads count="50"/>
+                    <keepalive-time time="10" unit="seconds"/>
+                </short-running-threads>
+                <long-running-threads>
+                    <core-threads count="50"/>
+                    <queue-length count="50"/>
+                    <max-threads count="50"/>
+                    <keepalive-time time="10" unit="seconds"/>
+                </long-running-threads>
+            </default-workmanager>
+            <cached-connection-manager/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:jdr:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:jmx:1.3">
+            <expose-resolved-model/>
+            <expose-expression-model/>
+            <remoting-connector/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:jpa:1.1">
+            <jpa default-extended-persistence-inheritance="DEEP"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:jsf:1.1"/>
+        <subsystem xmlns="urn:jboss:domain:mail:4.0">
+            <mail-session name="default" jndi-name="java:jboss/mail/Default">
+                <smtp-server outbound-socket-binding-ref="mail-smtp"/>
+            </mail-session>
+        </subsystem>
+
+<subsystem xmlns="urn:jboss:domain:messaging-activemq:16.0">
+    <server name="default">
+        <security elytron-domain="messaging"/>
+        <security-setting name="#">
+            <role name="guest" send="true" consume="true" create-non-durable-queue="true" delete-non-durable-queue="true"/>
+        </security-setting>
+        <address-setting name="#" dead-letter-address="jms.queue.DLQ" expiry-address="jms.queue.ExpiryQueue" max-size-bytes="10485760" page-size-bytes="2097152" message-counter-history-day-limit="10"/>
+        <http-connector name="http-connector" socket-binding="http" endpoint="http-acceptor"/>
+        <http-connector name="http-connector-throughput" socket-binding="http" endpoint="http-acceptor-throughput">
+            <param name="batch-delay" value="50"/>
+        </http-connector>
+        <in-vm-connector name="in-vm" server-id="0">
+            <param name="buffer-pooling" value="false"/>
+        </in-vm-connector>
+        <http-acceptor name="http-acceptor" http-listener="default"/>
+        <http-acceptor name="http-acceptor-throughput" http-listener="default">
+            <param name="batch-delay" value="50"/>
+            <param name="direct-deliver" value="false"/>
+        </http-acceptor>
+        <in-vm-acceptor name="in-vm" server-id="0">
+            <param name="buffer-pooling" value="false"/>
+        </in-vm-acceptor>
+
+<jms-queue name="testQueue" entries="java:/testQueue java:/jms/queue/testQueue"/>
+<jms-queue name="MDB_QUEUE" entries="java:/MDB_QUEUE java:/jms/queue/MDB_QUEUE"/>
+<jms-queue name="MDB_QUEUE_REPLY" entries="java:/MDB_QUEUE_REPLY java:/jms/queue/MDB_QUEUE_REPLY"/>
+<jms-queue name="myQueue" entries="java:/myQueue java:/jms/queue/myQueue"/>
+<jms-queue name="MY_QUEUE" entries="java:/MY_QUEUE java:/jms/queue/MY_QUEUE"/>
+<jms-queue name="MY_QUEUE2" entries="java:/MY_QUEUE2 java:/jms/queue/MY_QUEUE2"/>
+<jms-queue name="Q2" entries="java:/Q2 java:/jms/queue/Q2"/>
+<jms-queue name="QUEUE_BMT" entries="java:/QUEUE_BMT java:/jms/queue/QUEUE_BMT"/>
+<jms-queue name="ejb_ee_bb_localaccess_mdbqaccesstest_MDB_QUEUE" entries="java:/ejb_ee_bb_localaccess_mdbqaccesstest_MDB_QUEUE java:/jms/queue/ejb_ee_bb_localaccess_mdbqaccesstest_MDB_QUEUE"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejblink_casesensT_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_ejblink_casesensT_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_ejblink_casesensT_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejblink_casesens_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_ejblink_casesens_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_ejblink_casesens_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejblink_casesens_TestBean" entries="java:/ejb_ee_deploy_mdb_ejblink_casesens_TestBean java:/jms/queue/ejb_ee_deploy_mdb_ejblink_casesens_TestBean"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejblink_scopeT_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_ejblink_scopeT_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_ejblink_scopeT_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejblink_scope_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_ejblink_scope_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_ejblink_scope_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejblink_scope_TestBean" entries="java:/ejb_ee_deploy_mdb_ejblink_scope_TestBean java:/jms/queue/ejb_ee_deploy_mdb_ejblink_scope_TestBean"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejblink_singleT_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_ejblink_singleT_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_ejblink_singleT_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejblink_single_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_ejblink_single_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_ejblink_single_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejblink_single_TestBean" entries="java:/ejb_ee_deploy_mdb_ejblink_single_TestBean java:/jms/queue/ejb_ee_deploy_mdb_ejblink_single_TestBean"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejblink_single_TestBeanBMT" entries="java:/ejb_ee_deploy_mdb_ejblink_single_TestBeanBMT java:/jms/queue/ejb_ee_deploy_mdb_ejblink_single_TestBeanBMT"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejbref_casesensT_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_ejbref_casesensT_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_ejbref_casesensT_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejbref_casesens_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_ejbref_casesens_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_ejbref_casesens_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejbref_casesens_TestBean" entries="java:/ejb_ee_deploy_mdb_ejbref_casesens_TestBean java:/jms/queue/ejb_ee_deploy_mdb_ejbref_casesens_TestBean"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejbref_scopeT_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_ejbref_scopeT_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_ejbref_scopeT_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejbref_scope_Cyrano" entries="java:/ejb_ee_deploy_mdb_ejbref_scope_Cyrano java:/jms/queue/ejb_ee_deploy_mdb_ejbref_scope_Cyrano"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejbref_scope_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_ejbref_scope_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_ejbref_scope_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejbref_scope_Romeo" entries="java:/ejb_ee_deploy_mdb_ejbref_scope_Romeo java:/jms/queue/ejb_ee_deploy_mdb_ejbref_scope_Romeo"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejbref_scope_Tristan" entries="java:/ejb_ee_deploy_mdb_ejbref_scope_Tristan java:/jms/queue/ejb_ee_deploy_mdb_ejbref_scope_Tristan"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejbref_singleT_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_ejbref_singleT_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_ejbref_singleT_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejbref_single_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_ejbref_single_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_ejbref_single_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejbref_single_TestBean" entries="java:/ejb_ee_deploy_mdb_ejbref_single_TestBean java:/jms/queue/ejb_ee_deploy_mdb_ejbref_single_TestBean"/>
+<jms-queue name="ejb_ee_deploy_mdb_ejbref_single_TestBeanBMT" entries="java:/ejb_ee_deploy_mdb_ejbref_single_TestBeanBMT java:/jms/queue/ejb_ee_deploy_mdb_ejbref_single_TestBeanBMT"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_casesensT_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_enventry_casesensT_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_enventry_casesensT_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_casesens_CaseBean" entries="java:/ejb_ee_deploy_mdb_enventry_casesens_CaseBean java:/jms/queue/ejb_ee_deploy_mdb_enventry_casesens_CaseBean"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_casesens_CaseBeanBMT" entries="java:/ejb_ee_deploy_mdb_enventry_casesens_CaseBeanBMT java:/jms/queue/ejb_ee_deploy_mdb_enventry_casesens_CaseBeanBMT"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_casesens_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_enventry_casesens_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_enventry_casesens_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_scopeT_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_enventry_scopeT_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_enventry_scopeT_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_scope_Bean1_MultiJar" entries="java:/ejb_ee_deploy_mdb_enventry_scope_Bean1_MultiJar java:/jms/queue/ejb_ee_deploy_mdb_enventry_scope_Bean1_MultiJar"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_scope_Bean1_SameJar" entries="java:/ejb_ee_deploy_mdb_enventry_scope_Bean1_SameJar java:/jms/queue/ejb_ee_deploy_mdb_enventry_scope_Bean1_SameJar"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_scope_Bean2_SameJar" entries="java:/ejb_ee_deploy_mdb_enventry_scope_Bean2_SameJar java:/jms/queue/ejb_ee_deploy_mdb_enventry_scope_Bean2_SameJar"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_scope_Bean2_MultiJar" entries="java:/ejb_ee_deploy_mdb_enventry_scope_Bean2_MultiJar java:/jms/queue/ejb_ee_deploy_mdb_enventry_scope_Bean2_MultiJar"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_scope_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_enventry_scope_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_enventry_scope_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_singleT_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_enventry_singleT_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_enventry_singleT_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_single_AllBean" entries="java:/ejb_ee_deploy_mdb_enventry_single_AllBean java:/jms/queue/ejb_ee_deploy_mdb_enventry_single_AllBean"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_single_AllBeanBMT" entries="java:/ejb_ee_deploy_mdb_enventry_single_AllBeanBMT java:/jms/queue/ejb_ee_deploy_mdb_enventry_single_AllBeanBMT"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_single_BooleanBean" entries="java:/ejb_ee_deploy_mdb_enventry_single_BooleanBean java:/jms/queue/ejb_ee_deploy_mdb_enventry_single_BooleanBean"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_single_ByteBean" entries="java:/ejb_ee_deploy_mdb_enventry_single_ByteBean java:/jms/queue/ejb_ee_deploy_mdb_enventry_single_ByteBean"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_single_DoubleBean" entries="java:/ejb_ee_deploy_mdb_enventry_single_DoubleBean java:/jms/queue/ejb_ee_deploy_mdb_enventry_single_DoubleBean"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_single_FloatBean" entries="java:/ejb_ee_deploy_mdb_enventry_single_FloatBean java:/jms/queue/ejb_ee_deploy_mdb_enventry_single_FloatBean"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_single_IntegerBean" entries="java:/ejb_ee_deploy_mdb_enventry_single_IntegerBean java:/jms/queue/ejb_ee_deploy_mdb_enventry_single_IntegerBean"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_single_LongBean" entries="java:/ejb_ee_deploy_mdb_enventry_single_LongBean java:/jms/queue/ejb_ee_deploy_mdb_enventry_single_LongBean"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_single_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_enventry_single_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_enventry_single_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_single_ShortBean" entries="java:/ejb_ee_deploy_mdb_enventry_single_ShortBean java:/jms/queue/ejb_ee_deploy_mdb_enventry_single_ShortBean"/>
+<jms-queue name="ejb_ee_deploy_mdb_enventry_single_StringBean" entries="java:/ejb_ee_deploy_mdb_enventry_single_StringBean java:/jms/queue/ejb_ee_deploy_mdb_enventry_single_StringBean"/>
+<jms-queue name="ejb_ee_deploy_mdb_resref_singleT_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_resref_singleT_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_resref_singleT_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_resref_single_ReplyQueue" entries="java:/ejb_ee_deploy_mdb_resref_single_ReplyQueue java:/jms/queue/ejb_ee_deploy_mdb_resref_single_ReplyQueue"/>
+<jms-queue name="ejb_ee_deploy_mdb_resref_single_TestBean" entries="java:/ejb_ee_deploy_mdb_resref_single_TestBean java:/jms/queue/ejb_ee_deploy_mdb_resref_single_TestBean"/>
+<jms-queue name="ejb_ee_sec_stateful_mdb_MDB_QUEUE" entries="java:/ejb_ee_sec_stateful_mdb_MDB_QUEUE java:/jms/queue/ejb_ee_sec_stateful_mdb_MDB_QUEUE"/>
+<jms-queue name="ejb_ee_timer_mdb_MsgBean" entries="java:/ejb_ee_timer_mdb_MsgBean java:/jms/queue/ejb_ee_timer_mdb_MsgBean"/>
+<jms-queue name="fooQ" entries="java:/fooQ java:/jms/queue/fooQ"/>
+<jms-queue name="jms_ee_mdb_mdb_exceptQ_MDB_QUEUETXNS_CMT" entries="java:/jms_ee_mdb_mdb_exceptQ_MDB_QUEUETXNS_CMT java:/jms/queue/jms_ee_mdb_mdb_exceptQ_MDB_QUEUETXNS_CMT"/>
+<jms-queue name="jms_ee_mdb_mdb_exceptQ_MDB_QUEUE_BMT" entries="java:/jms_ee_mdb_mdb_exceptQ_MDB_QUEUE_BMT java:/jms/queue/jms_ee_mdb_mdb_exceptQ_MDB_QUEUE_BMT"/>
+<jms-queue name="jms_ee_mdb_mdb_exceptQ_MDB_QUEUE_CMT" entries="java:/jms_ee_mdb_mdb_exceptQ_MDB_QUEUE_CMT java:/jms/queue/jms_ee_mdb_mdb_exceptQ_MDB_QUEUE_CMT"/>
+<jms-queue name="jms_ee_mdb_mdb_exceptT_MDB_QUEUETXNS_CMT" entries="java:/jms_ee_mdb_mdb_exceptT_MDB_QUEUETXNS_CMT java:/jms/queue/jms_ee_mdb_mdb_exceptT_MDB_QUEUETXNS_CMT"/>
+<jms-queue name="jms_ee_mdb_mdb_exceptT_MDB_QUEUE_BMT" entries="java:/jms_ee_mdb_mdb_exceptT_MDB_QUEUE_BMT java:/jms/queue/jms_ee_mdb_mdb_exceptT_MDB_QUEUE_BMT"/>
+<jms-queue name="jms_ee_mdb_mdb_exceptT_MDB_QUEUE_CMT" entries="java:/jms_ee_mdb_mdb_exceptT_MDB_QUEUE_CMT java:/jms/queue/jms_ee_mdb_mdb_exceptT_MDB_QUEUE_CMT"/>
+<jms-queue name="jms_ee_mdb_mdb_msgHdrQ_MDB_QUEUE" entries="java:/jms_ee_mdb_mdb_msgHdrQ_MDB_QUEUE java:/jms/queue/jms_ee_mdb_mdb_msgHdrQ_MDB_QUEUE"/>
+<jms-queue name="jms_ee_mdb_mdb_msgPropsQ_MDB_QUEUE" entries="java:/jms_ee_mdb_mdb_msgPropsQ_MDB_QUEUE java:/jms/queue/jms_ee_mdb_mdb_msgPropsQ_MDB_QUEUE"/>
+<jms-queue name="jms_ee_mdb_mdb_msgTypesQ1_MDB_QUEUE" entries="java:/jms_ee_mdb_mdb_msgTypesQ1_MDB_QUEUE java:/jms/queue/jms_ee_mdb_mdb_msgTypesQ1_MDB_QUEUE"/>
+<jms-queue name="jms_ee_mdb_mdb_msgTypesQ2_MDB_QUEUE" entries="java:/jms_ee_mdb_mdb_msgTypesQ2_MDB_QUEUE java:/jms/queue/jms_ee_mdb_mdb_msgTypesQ2_MDB_QUEUE"/>
+<jms-queue name="jms_ee_mdb_mdb_msgTypesQ3_MDB_QUEUE" entries="java:/jms_ee_mdb_mdb_msgTypesQ3_MDB_QUEUE java:/jms/queue/jms_ee_mdb_mdb_msgTypesQ3_MDB_QUEUE"/>
+<jms-queue name="jms_ee_mdb_mdb_rec_MDB_QUEUE" entries="java:/jms_ee_mdb_mdb_rec_MDB_QUEUE java:/jms/queue/jms_ee_mdb_mdb_rec_MDB_QUEUE"/>
+<jms-queue name="jms_ee_mdb_mdb_sndToQueue_MDB_QUEUE" entries="java:/jms_ee_mdb_mdb_sndToQueue_MDB_QUEUE java:/jms/queue/jms_ee_mdb_mdb_sndToQueue_MDB_QUEUE"/>
+<jms-queue name="jms_ee_mdb_mdb_sndQ_MDB_QUEUE" entries="java:/jms_ee_mdb_mdb_sndQ_MDB_QUEUE java:/jms/queue/jms_ee_mdb_mdb_sndQ_MDB_QUEUE"/>
+<jms-queue name="jms_ee_mdb_mdb_synchrec_MDB_QUEUE" entries="java:/jms_ee_mdb_mdb_synchrec_MDB_QUEUE java:/jms/queue/jms_ee_mdb_mdb_synchrec_MDB_QUEUE"/>
+<jms-queue name="jms_ee_mdb_xa_MDB_QUEUE_BMT" entries="java:/jms_ee_mdb_xa_MDB_QUEUE_BMT java:/jms/queue/jms_ee_mdb_xa_MDB_QUEUE_BMT"/>
+<jms-queue name="jms_ee_mdb_xa_MDB_QUEUE_CMT" entries="java:/jms_ee_mdb_xa_MDB_QUEUE_CMT java:/jms/queue/jms_ee_mdb_xa_MDB_QUEUE_CMT"/>
+<jms-queue name="ejb_sec_mdb_MDB_QUEUE_BMT" entries="java:/ejb_sec_mdb_MDB_QUEUE_BMT java:/jms/queue/ejb_sec_mdb_MDB_QUEUE_BMT"/>
+<jms-queue name="ejb_sec_mdb_MDB_QUEUE_CMT" entries="java:/ejb_sec_mdb_MDB_QUEUE_CMT java:/jms/queue/ejb_sec_mdb_MDB_QUEUE_CMT"/>
+<jms-queue name="testQ0" entries="java:/testQ0 java:/jms/queue/testQ0"/>
+<jms-queue name="testQ1" entries="java:/testQ1 java:/jms/queue/testQ1"/>
+<jms-queue name="testQ2" entries="java:/testQ2 java:/jms/queue/testQ2"/>
+<jms-queue name="testQueue2" entries="java:/testQueue2 java:/jms/queue/testQueue2"/>
+<jms-topic name="myTopic" entries="java:/myTopic java:/jms/topic/myTopic"/>
+<jms-topic name="MY_TOPIC" entries="java:/MY_TOPIC java:/jms/topic/MY_TOPIC"/>
+<jms-topic name="MY_TOPIC1" entries="java:/MY_TOPIC1 java:/jms/topic/MY_TOPIC1"/>
+<jms-topic name="MY_TOPIC2" entries="java:/MY_TOPIC2 java:/jms/topic/MY_TOPIC2"/>
+<jms-topic name="testT0" entries="java:/testT0 java:/jms/topic/testT0"/>
+<jms-topic name="testT1" entries="java:/testT1 java:/jms/topic/testT1"/>
+<jms-topic name="testT2" entries="java:/testT2 java:/jms/topic/testT2"/>
+<jms-topic name="TOPIC_BMT" entries="java:/TOPIC_BMT java:/jms/topic/TOPIC_BMT"/>
+<jms-topic name="ejb_ee_bb_localaccess_mdbtaccesstest_MDB_TOPIC" entries="java:/ejb_ee_bb_localaccess_mdbtaccesstest_MDB_TOPIC java:/jms/topic/ejb_ee_bb_localaccess_mdbtaccesstest_MDB_TOPIC"/>
+<jms-topic name="ejb_ee_deploy_mdb_ejblink_casesensT_TestBean" entries="java:/ejb_ee_deploy_mdb_ejblink_casesensT_TestBean java:/jms/topic/ejb_ee_deploy_mdb_ejblink_casesensT_TestBean"/>
+<jms-topic name="ejb_ee_deploy_mdb_ejblink_scopeT_TestBean" entries="java:/ejb_ee_deploy_mdb_ejblink_scopeT_TestBean java:/jms/topic/ejb_ee_deploy_mdb_ejblink_scopeT_TestBean"/>
+<jms-topic name="ejb_ee_deploy_mdb_ejblink_singleT_TestBean" entries="java:/ejb_ee_deploy_mdb_ejblink_singleT_TestBean java:/jms/topic/ejb_ee_deploy_mdb_ejblink_singleT_TestBean"/>
+<jms-topic name="ejb_ee_deploy_mdb_ejblink_singleT_TestBeanBMT" entries="java:/ejb_ee_deploy_mdb_ejblink_singleT_TestBeanBMT java:/jms/topic/ejb_ee_deploy_mdb_ejblink_singleT_TestBeanBMT"/>
+<jms-topic name="ejb_ee_deploy_mdb_ejbref_casesensT_TestBean" entries="java:/ejb_ee_deploy_mdb_ejbref_casesensT_TestBean java:/jms/topic/ejb_ee_deploy_mdb_ejbref_casesensT_TestBean"/>
+<jms-topic name="ejb_ee_deploy_mdb_ejbref_scopeT_Cyrano" entries="java:/ejb_ee_deploy_mdb_ejbref_scopeT_Cyrano java:/jms/topic/ejb_ee_deploy_mdb_ejbref_scopeT_Cyrano"/>
+<jms-topic name="ejb_ee_deploy_mdb_ejbref_scopeT_Romeo" entries="java:/ejb_ee_deploy_mdb_ejbref_scopeT_Romeo java:/jms/topic/ejb_ee_deploy_mdb_ejbref_scopeT_Romeo"/>
+<jms-topic name="ejb_ee_deploy_mdb_ejbref_scopeT_Tristan" entries="java:/ejb_ee_deploy_mdb_ejbref_scopeT_Tristan java:/jms/topic/ejb_ee_deploy_mdb_ejbref_scopeT_Tristan"/>
+<jms-topic name="ejb_ee_deploy_mdb_ejbref_singleT_TestBean" entries="java:/ejb_ee_deploy_mdb_ejbref_singleT_TestBean java:/jms/topic/ejb_ee_deploy_mdb_ejbref_singleT_TestBean"/>
+<jms-topic name="ejb_ee_deploy_mdb_ejbref_singleT_TestBeanBMT" entries="java:/ejb_ee_deploy_mdb_ejbref_singleT_TestBeanBMT java:/jms/topic/ejb_ee_deploy_mdb_ejbref_singleT_TestBeanBMT"/>
+<jms-topic name="ejb_ee_deploy_mdb_enventry_casesensT_CaseBean" entries="java:/ejb_ee_deploy_mdb_enventry_casesensT_CaseBean java:/jms/topic/ejb_ee_deploy_mdb_enventry_casesensT_CaseBean"/>
+<jms-topic name="ejb_ee_deploy_mdb_enventry_casesensT_CaseBeanBMT" entries="java:/ejb_ee_deploy_mdb_enventry_casesensT_CaseBeanBMT java:/jms/topic/ejb_ee_deploy_mdb_enventry_casesensT_CaseBeanBMT"/>
+<jms-topic name="ejb_ee_deploy_mdb_enventry_scopeT_Bean1_MultiJar" entries="java:/ejb_ee_deploy_mdb_enventry_scopeT_Bean1_MultiJar java:/jms/topic/ejb_ee_deploy_mdb_enventry_scopeT_Bean1_MultiJar"/>
+<jms-topic name="ejb_ee_deploy_mdb_enventry_scopeT_Bean1_SameJar" entries="java:/ejb_ee_deploy_mdb_enventry_scopeT_Bean1_SameJar java:/jms/topic/ejb_ee_deploy_mdb_enventry_scopeT_Bean1_SameJar"/>
+<jms-topic name="ejb_ee_deploy_mdb_enventry_scopeT_Bean2_MultiJar" entries="java:/ejb_ee_deploy_mdb_enventry_scopeT_Bean2_MultiJar java:/jms/topic/ejb_ee_deploy_mdb_enventry_scopeT_Bean2_MultiJar"/>
+<jms-topic name="ejb_ee_deploy_mdb_enventry_scopeT_Bean2_SameJar" entries="java:/ejb_ee_deploy_mdb_enventry_scopeT_Bean2_SameJar java:/jms/topic/ejb_ee_deploy_mdb_enventry_scopeT_Bean2_SameJar"/>
+<jms-topic name="ejb_ee_deploy_mdb_enventry_singleT_AllBean" entries="java:/ejb_ee_deploy_mdb_enventry_singleT_AllBean java:/jms/topic/ejb_ee_deploy_mdb_enventry_singleT_AllBean"/>
+<jms-topic name="ejb_ee_deploy_mdb_enventry_singleT_AllBeanBMT" entries="java:/ejb_ee_deploy_mdb_enventry_singleT_AllBeanBMT java:/jms/topic/ejb_ee_deploy_mdb_enventry_singleT_AllBeanBMT"/>
+<jms-topic name="ejb_ee_deploy_mdb_enventry_singleT_BooleanBean" entries="java:/ejb_ee_deploy_mdb_enventry_singleT_BooleanBean java:/jms/topic/ejb_ee_deploy_mdb_enventry_singleT_BooleanBean"/>
+<jms-topic name="ejb_ee_deploy_mdb_enventry_singleT_ByteBean" entries="java:/ejb_ee_deploy_mdb_enventry_singleT_ByteBean java:/jms/topic/ejb_ee_deploy_mdb_enventry_singleT_ByteBean"/>
+<jms-topic name="ejb_ee_deploy_mdb_enventry_singleT_DoubleBean" entries="java:/ejb_ee_deploy_mdb_enventry_singleT_DoubleBean java:/jms/topic/ejb_ee_deploy_mdb_enventry_singleT_DoubleBean"/>
+<jms-topic name="ejb_ee_deploy_mdb_enventry_singleT_FloatBean" entries="java:/ejb_ee_deploy_mdb_enventry_singleT_FloatBean java:/jms/topic/ejb_ee_deploy_mdb_enventry_singleT_FloatBean"/>
+<jms-topic name="ejb_ee_deploy_mdb_enventry_singleT_IntegerBean" entries="java:/ejb_ee_deploy_mdb_enventry_singleT_IntegerBean java:/jms/topic/ejb_ee_deploy_mdb_enventry_singleT_IntegerBean"/>
+<jms-topic name="ejb_ee_deploy_mdb_enventry_singleT_LongBean" entries="java:/ejb_ee_deploy_mdb_enventry_singleT_LongBean java:/jms/topic/ejb_ee_deploy_mdb_enventry_singleT_LongBean"/>
+<jms-topic name="ejb_ee_deploy_mdb_enventry_singleT_ShortBean" entries="java:/ejb_ee_deploy_mdb_enventry_singleT_ShortBean java:/jms/topic/ejb_ee_deploy_mdb_enventry_singleT_ShortBean"/>
+<jms-topic name="ejb_ee_deploy_mdb_enventry_singleT_StringBean" entries="java:/ejb_ee_deploy_mdb_enventry_singleT_StringBean java:/jms/topic/ejb_ee_deploy_mdb_enventry_singleT_StringBean"/>
+<jms-topic name="ejb_ee_deploy_mdb_resref_singleT_TestBean" entries="java:/ejb_ee_deploy_mdb_resref_singleT_TestBean java:/jms/topic/ejb_ee_deploy_mdb_resref_singleT_TestBean"/>
+<jms-topic name="jms_ee_mdb_mdb_exceptT_MDB_DURABLETXNS_CMT" entries="java:/jms_ee_mdb_mdb_exceptT_MDB_DURABLETXNS_CMT java:/jms/topic/jms_ee_mdb_mdb_exceptT_MDB_DURABLETXNS_CMT"/>
+<jms-topic name="jms_ee_mdb_mdb_exceptT_MDB_DURABLE_BMT" entries="java:/jms_ee_mdb_mdb_exceptT_MDB_DURABLE_BMT java:/jms/topic/jms_ee_mdb_mdb_exceptT_MDB_DURABLE_BMT"/>
+<jms-topic name="jms_ee_mdb_mdb_exceptT_MDB_DURABLE_CMT" entries="java:/jms_ee_mdb_mdb_exceptT_MDB_DURABLE_CMT java:/jms/topic/jms_ee_mdb_mdb_exceptT_MDB_DURABLE_CMT"/>
+<jms-topic name="jms_ee_mdb_mdb_msgHdrT_MDB_TOPIC" entries="java:/jms_ee_mdb_mdb_msgHdrT_MDB_TOPIC java:/jms/topic/jms_ee_mdb_mdb_msgHdrT_MDB_TOPIC"/>
+<jms-topic name="jms_ee_mdb_mdb_msgPropsT_MDB_TOPIC" entries="java:/jms_ee_mdb_mdb_msgPropsT_MDB_TOPIC java:/jms/topic/jms_ee_mdb_mdb_msgPropsT_MDB_TOPIC"/>
+<jms-topic name="jms_ee_mdb_mdb_msgTypesT1_MDB_TOPIC" entries="java:/jms_ee_mdb_mdb_msgTypesT1_MDB_TOPIC java:/jms/topic/jms_ee_mdb_mdb_msgTypesT1_MDB_TOPIC"/>
+<jms-topic name="jms_ee_mdb_mdb_msgTypesT2_MDB_TOPIC" entries="java:/jms_ee_mdb_mdb_msgTypesT2_MDB_TOPIC java:/jms/topic/jms_ee_mdb_mdb_msgTypesT2_MDB_TOPIC"/>
+<jms-topic name="jms_ee_mdb_mdb_msgTypesT3_MDB_TOPIC" entries="java:/jms_ee_mdb_mdb_msgTypesT3_MDB_TOPIC java:/jms/topic/jms_ee_mdb_mdb_msgTypesT3_MDB_TOPIC"/>
+<jms-topic name="jms_ee_mdb_mdb_rec_MDB_TOPIC" entries="java:/jms_ee_mdb_mdb_rec_MDB_TOPIC java:/jms/topic/jms_ee_mdb_mdb_rec_MDB_TOPIC"/>
+<jms-topic name="jms_ee_mdb_mdb_sndToTopic_MDB_TOPIC" entries="java:/jms_ee_mdb_mdb_sndToTopic_MDB_TOPIC java:/jms/topic/jms_ee_mdb_mdb_sndToTopic_MDB_TOPIC"/>
+<jms-topic name="jms_ee_mdb_mdb_sndToTopic_MDB_TOPIC_REPLY" entries="java:/jms_ee_mdb_mdb_sndToTopic_MDB_TOPIC_REPLY java:/jms/topic/jms_ee_mdb_mdb_sndToTopic_MDB_TOPIC_REPLY"/>
+<jms-topic name="jms_ee_mdb_xa_MDB_DURABLE_BMT" entries="java:/jms_ee_mdb_xa_MDB_DURABLE_BMT java:/jms/topic/jms_ee_mdb_xa_MDB_DURABLE_BMT"/>
+<jms-topic name="jms_ee_mdb_xa_MDB_DURABLE_CMT" entries="java:/jms_ee_mdb_xa_MDB_DURABLE_CMT java:/jms/topic/jms_ee_mdb_xa_MDB_DURABLE_CMT"/>
+
+        <connection-factory name="InVmConnectionFactory" entries="java:/ConnectionFactory" connectors="in-vm"/>
+        <connection-factory name="RemoteConnectionFactory" entries="java:jboss/exported/jms/RemoteConnectionFactory" connectors="http-connector"/>
+
+        <connection-factory name="MDBTACCESSTEST_FACTORY" entries="java:/MDBTACCESSTEST_FACTORY" connectors="http-connector" client-id="cts1" consumer-window-size="0" />
+        <connection-factory name="DURABLE_BMT_CONNECTION_FACTORY" entries="java:/DURABLE_BMT_CONNECTION_FACTORY" connectors="http-connector" client-id="cts2" consumer-window-size="0" />
+        <connection-factory name="DURABLE_CMT_CONNECTION_FACTORY" entries="java:/DURABLE_CMT_CONNECTION_FACTORY" connectors="http-connector" client-id="cts3"/>
+        <connection-factory name="DURABLE_BMT_XCONNECTION_FACTORY" entries="java:/DURABLE_BMT_XCONNECTION_FACTORY" connectors="http-connector" client-id="cts4"/>
+        <connection-factory name="DURABLE_CMT_XCONNECTION_FACTORY" entries="java:/DURABLE_CMT_XCONNECTION_FACTORY" connectors="http-connector" client-id="cts5"/>
+        <connection-factory name="DURABLE_CMT_TXNS_XCONNECTION_FACTORY" entries="java:/DURABLE_CMT_TXNS_XCONNECTION_FACTORY" connectors="http-connector" client-id="cts6"/>
+
+        <pooled-connection-factory name="DURABLE_SUB_CONNECTION_FACTORY" entries="jms:/DURABLE_SUB_CONNECTION_FACTORY" connectors="http-connector" client-id="cts" transaction="xa" consumer-window-size="0" />
+        <pooled-connection-factory name="activemq-ra" entries="java:/JmsXA java:jboss/DefaultJMSConnectionFactory jms/ConnectionFactory" connectors="http-connector" client-id="cts7" />
+        <pooled-connection-factory name="activemq-ra2" entries="java:/jms/QueueConnectionFactory jms:/QueueConnectionFactory java:/jms/TopicConnectionFactory jms:/TopicConnectionFactory" connectors="in-vm" transaction="xa" />
+        <pooled-connection-factory name="jmsra" entries="java:/jms/QueueConnectionFactory2 jms:/QueueConnectionFactory2 java:/jms/TopicConnectionFactory2 jms:/TopicConnectionFactory2" connectors="in-vm" transaction="xa" />
+    </server>
+</subsystem>
+
+<subsystem xmlns="urn:wildfly:metrics:1.0" security-enabled="false" exposed-subsystems="*" prefix="${wildfly.metrics.prefix:wildfly}"/>
+        <subsystem xmlns="urn:wildfly:microprofile-config-smallrye:2.0"/>
+        <subsystem xmlns="urn:wildfly:microprofile-jwt-smallrye:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:naming:2.0">
+            <remote-naming/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:remoting:7.0">
+            <endpoint worker="default"/>
+            <http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-sasl-authentication"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:resource-adapters:7.1"/>
+        <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
+            <deployment-permissions>
+                <maximum-set>
+                    <permission class="java.security.AllPermission"/>
+                </maximum-set>
+            </deployment-permissions>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:transactions:6.0">
+            <core-environment node-identifier="${jboss.tx.node.id:1}">
+                <process-id>
+                    <uuid/>
+                </process-id>
+            </core-environment>
+            <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
+            <coordinator-environment statistics-enabled="${wildfly.transactions.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
+            <object-store path="tx-object-store" relative-to="jboss.server.data.dir"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:undertow:14.0" default-virtual-host="default-host" default-servlet-container="default" default-server="default-server" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}" default-security-domain="other">
+            <byte-buffer-pool name="default"/>
+            <buffer-cache name="default"/>
+            <server name="default-server">
+                <http-listener name="default" socket-binding="http" redirect-socket="https" enable-http2="true"/>
+                <https-listener name="https" socket-binding="https" ssl-context="applicationSSC" enable-http2="true"/>
+                <host name="default-host" alias="localhost">
+                    <location name="/" handler="welcome-content"/>
+                    <http-invoker http-authentication-factory="application-http-authentication"/>
+                </host>
+            </server>
+            <servlet-container name="default">
+                <jsp-config/>
+                <websockets/>
+            </servlet-container>
+            <handlers>
+                <file name="welcome-content" path="${jboss.home.dir}/welcome-content"/>
+            </handlers>
+            <application-security-domains>
+                <application-security-domain name="other" security-domain="ApplicationDomain"/>
+            </application-security-domains>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:webservices:2.0" statistics-enabled="${wildfly.webservices.statistics-enabled:${wildfly.statistics-enabled:false}}">
+            <wsdl-host>${jboss.bind.address:127.0.0.1}</wsdl-host>
+            <endpoint-config name="Standard-Endpoint-Config"/>
+            <endpoint-config name="Recording-Endpoint-Config">
+                <pre-handler-chain name="recording-handlers" protocol-bindings="##SOAP11_HTTP ##SOAP11_HTTP_MTOM ##SOAP12_HTTP ##SOAP12_HTTP_MTOM">
+                    <handler name="RecordingHandler" class="org.jboss.ws.common.invocation.RecordingServerHandler"/>
+                </pre-handler-chain>
+            </endpoint-config>
+            <client-config name="Standard-Client-Config"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:weld:5.0"/>
+    </profile>
+    <interfaces>
+        <interface name="management">
+            <inet-address value="${jboss.bind.address.management:127.0.0.1}"/>
+        </interface>
+        <interface name="public">
+            <inet-address value="${jboss.bind.address:127.0.0.1}"/>
+        </interface>
+        <interface name="unsecure">
+            <inet-address value="${jboss.bind.address.unsecure:127.0.0.1}"/>
+        </interface>
+    </interfaces>
+    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
+        <socket-binding name="ajp" port="${jboss.ajp.port:8009}"/>
+        <socket-binding name="http" port="${jboss.http.port:8080}"/>
+        <socket-binding name="https" port="${jboss.https.port:8443}"/>
+        <socket-binding name="iiop" interface="unsecure" port="3528"/>
+        <socket-binding name="iiop-ssl" interface="unsecure" port="3529"/>
+        <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:9990}"/>
+        <socket-binding name="management-https" interface="management" port="${jboss.management.https.port:9993}"/>
+        <socket-binding name="txn-recovery-environment" port="4712"/>
+        <socket-binding name="txn-status-manager" port="4713"/>
+        <outbound-socket-binding name="mail-smtp">
+            <remote-destination host="${jboss.mail.server.host:localhost}" port="${jboss.mail.server.port:25}"/>
+        </outbound-socket-binding>
+    </socket-binding-group>
+</server>
