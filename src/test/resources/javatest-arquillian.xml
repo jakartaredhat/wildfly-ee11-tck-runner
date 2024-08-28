@@ -36,6 +36,7 @@
         <protocol type="javatest">
             <property name="workDir">${ts.home}/tmp</property>
             <property name="tsJteFile">${ts.home}/bin/ts.jte</property>
+            <property name="tsSqlStmtFile">${ts.home}/bin/tssql.stmt</property>
             <property name="trace">true</property>
         </protocol>
     </container>

@@ -42,7 +42,7 @@
         <version.jakarta.inject>2.0.1</version.jakarta.inject>
         <version.jakarta.servlet>5.0.0</version.jakarta.servlet>
         <version.jakarta.tck>11.0.0-SNAPSHOT</version.jakarta.tck>
-        <version.jakarta.tck.arquillian>1.0.0-M10</version.jakarta.tck.arquillian>
+        <version.jakarta.tck.arquillian>1.0.0-SNAPSHOT</version.jakarta.tck.arquillian>
         <version.org.wildfly.checkstyle-config>1.0.8.Final</version.org.wildfly.checkstyle-config>
         <!-- TCK properties -->
         <ts.home>${env.TS_HOME}</ts.home>
@@ -120,12 +120,7 @@
             <version>${version.jakarta.tck}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>jakarta.tck</groupId>
-            <artifactId>ejb</artifactId>
-            <version>${version.jakarta.tck}</version>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>jakarta.tck</groupId>
             <artifactId>ejb30</artifactId>
@@ -190,6 +185,13 @@
 
         <dependency>
             <groupId>jakarta.tck</groupId>
+            <artifactId>jdbc</artifactId>
+            <version>${version.jakarta.tck}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.tck</groupId>
             <artifactId>jms</artifactId>
             <version>${version.jakarta.tck}</version>
             <scope>test</scope>
@@ -220,6 +222,11 @@
         <dependency>
             <groupId>jakarta.tck.arquillian</groupId>
             <artifactId>arquillian-protocol-javatest</artifactId>
+            <version>${version.jakarta.tck.arquillian}</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.tck.arquillian</groupId>
+            <artifactId>arquillian-protocol-common</artifactId>
             <version>${version.jakarta.tck.arquillian}</version>
         </dependency>
         <dependency>
@@ -401,6 +408,41 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>ejb-appclient</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <dependenciesToScan>jakarta.tck:ejb</dependenciesToScan>
+                            <skip>false</skip>
+                            <groups>tck-appclient</groups>
+                            <includes>
+                                <!-- All tests -->
+                                <!--include>com/sun/ts/tests/ejb/**/*Test.java</include-->
+                                <!-- Examples of single tests -->
+                                <!--include>com.sun.ts.tests.jms.core.bytesMsgTopic.BytesMsgTopicTestsJspTest</include-->
+                                <!--include>com.sun.ts.tests.jms.ee.mdb.mdb_msgTypesT2.ClientTest</include-->
+                                <include>com.sun.ts.tests.ejb.ee.bb.localaccess.sbaccesstest.ClientTest</include>
+                            </includes>
+                            <properties>
+                                <configurationParameters>
+                                    junit.jupiter.extensions.autodetection.enabled = true
+                                    junit.platform.output.capture.stderr = true
+                                    junit.platform.output.capture.stdout = true
+                                    junit.platform.reporting.open.xml.enabled = false
+                                    junit.platform.reporting.output.dir = target/junit5-reports
+                                </configurationParameters>
+                            </properties>
+                            <systemPropertyVariables>
+                                <arquillian.xml>javatest-appclient-arquillian.xml</arquillian.xml>
+                                <ts.home>${ts.home}</ts.home>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+
+
+                    <execution>
                         <id>ejb30</id>
                         <phase>test</phase>
                         <goals>
@@ -503,6 +545,38 @@
                     </execution>
 
                     <execution>
+                        <id>jdbc-appclient</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <dependenciesToScan>jakarta.tck:jdbc</dependenciesToScan>
+                            <skip>false</skip>
+                            <groups>tck-appclient</groups>
+                            <includes>
+                                <!-- All tests -->
+                                <!--include>com/sun/ts/tests/jdbc/**/*Test.java</include-->
+                                <!-- Examples of single tests -->
+                                <include>com.sun.ts.tests.jdbc.ee.resultSet.resultSet11.resultSetClient11EjbTest</include>
+                            </includes>
+                            <properties>
+                                <configurationParameters>
+                                    junit.jupiter.extensions.autodetection.enabled = true
+                                    junit.platform.output.capture.stderr = true
+                                    junit.platform.output.capture.stdout = true
+                                    junit.platform.reporting.open.xml.enabled = false
+                                    junit.platform.reporting.output.dir = target/junit5-reports
+                                </configurationParameters>
+                            </properties>
+                            <systemPropertyVariables>
+                                <arquillian.xml>javatest-appclient-arquillian.xml</arquillian.xml>
+                                <ts.home>${ts.home}</ts.home>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+
+                    <execution>
                         <id>jms</id>
                         <phase>test</phase>
                         <goals>
@@ -517,6 +591,7 @@
                                 <include>com/sun/ts/tests/jms/**/*Test.java</include>
                                 <!-- Examples of single tests -->
                                 <!--include>com.sun.ts.tests.jms.core.bytesMsgTopic.BytesMsgTopicTestsJspTest</include-->
+                                <include>com.sun.ts.tests.jms.core20.sessiontests.ClientJspTest</include>
                             </includes>
                             <properties>
                                 <configurationParameters>
@@ -529,6 +604,38 @@
                             </properties>
                             <systemPropertyVariables>
                                 <arquillian.xml>javatest-arquillian.xml</arquillian.xml>
+                                <ts.home>${ts.home}</ts.home>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>jms-appclient</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <dependenciesToScan>jakarta.tck:jms</dependenciesToScan>
+                            <skip>false</skip>
+                            <groups>tck-appclient</groups>
+                            <includes>
+                                <!-- All tests -->
+                                <!--include>com/sun/ts/tests/jms/**/*Test.java</include-->
+                                <!-- Examples of single tests -->
+                                <!--include>com.sun.ts.tests.jms.core.bytesMsgTopic.BytesMsgTopicTestsJspTest</include-->
+                                <include>com.sun.ts.tests.jms.ee.mdb.mdb_msgTypesT2.ClientTest</include>
+                            </includes>
+                            <properties>
+                                <configurationParameters>
+                                    junit.jupiter.extensions.autodetection.enabled = true
+                                    junit.platform.output.capture.stderr = true
+                                    junit.platform.output.capture.stdout = true
+                                    junit.platform.reporting.open.xml.enabled = false
+                                    junit.platform.reporting.output.dir = target/junit5-reports
+                                </configurationParameters>
+                            </properties>
+                            <systemPropertyVariables>
+                                <arquillian.xml>javatest-appclient-arquillian.xml</arquillian.xml>
                                 <ts.home>${ts.home}</ts.home>
                             </systemPropertyVariables>
                         </configuration>
