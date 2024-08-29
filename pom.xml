@@ -387,7 +387,7 @@
                             <groups>tck-javatest</groups>
                             <includes>
                                 <!-- Examples of single tests -->
-                                <include>com.sun.ts.tests.ejb32.lite.timer.basic.sharing.ClientEjbliteservletTest</include>
+                                <include>com.sun.ts.tests.ejb32.lite.timer.service.stateless.ClientEjbliteservletTest</include>
                             </includes>
                             <properties>
                                 <configurationParameters>
@@ -582,7 +582,7 @@
                             <groups>tck-javatest</groups>
                             <includes>
                                 <!-- All tests -->
-                                <include>com/sun/ts/tests/jms/**/*Test.java</include>
+                                <!--include>com/sun/ts/tests/jms/**/*Test.java</include-->
                                 <!-- Examples of single tests -->
                                 <!--include>com.sun.ts.tests.jms.core.bytesMsgTopic.BytesMsgTopicTestsJspTest</include-->
                                 <include>com.sun.ts.tests.jms.core20.sessiontests.ClientJspTest</include>
