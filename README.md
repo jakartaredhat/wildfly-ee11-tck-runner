@@ -11,7 +11,50 @@ The runner needs the following dependencies. These will be installed by the setu
 * https://gitlab.cee.redhat.com/j2eects/scripts.git. Also requires VPN to clone, but not run.
 
 ### TCK ENV Setup
-Run the setup.sh script from the root of the wildfly-ee11-tck-runner repo on a host with a Red Hat VPN connection.
+Run the setup.sh script from the root of the wildfly-ee11-tck-runner repo on a host with a Red Hat VPN connection. The script does the following:
+
+* Clones and builds the 11.0.0-SNAPSHOT of the EE 11 TCK test artifacts
+* Clones and builds a 1.0.0-SNAPSHOT of the jakartaee-tck-tools/arquillian protocols used by the TCK
+* Clones the JBoss CTS scripts
+* Runs the tck10.sh script to:
+  * build the Wildfly EE 11 preview
+  * download the EE10 TCK
+  * download derby
+  * download glassfish7
+  * configure wildfly with EE10 content
+  * init derby with EE10 TCK content
+  * run the EE10 tck script run a dummy test to start/stop wildfly
+
+
+After the script completes, your wildflytckroot should contain:
+
+```
+[starksm@scottryzen tck-test]$ ls ../wildflytckroot/
+apache-ant-1.10.6           glassfish-7.0.13.zip             platform-tck
+cts-10-mods                 jakartaeetck                     scripts
+db-derby-10.15.2.0-bin      jakartaee-tck-tools              tck10.log
+db-derby-10.15.2.0-bin.zip  jakarta-jakartaeetck-10.0.5.zip  wildfly
+glassfish7                  logs
+```
+
+#### Setup ENV Variables used in wildfly-ee11-tck-runner/pom.xml
+The TS_HOME env should be set to the root of the EE10 TCK, which should be:
+`export TS_HOME=$wildflytckroot/jakartaeetck`
+
+The WFLY_HOME should be the just built wildfly preview:
+`export WFLY_HOME=$wildflytckroot/wildfly/dist/target/wildfly-34.0.0.Beta1-SNAPSHOT`
+
+The exact version number will depend on when you run the script, so validate the build version.
+
+#### Verify the setup
+To verify the setup, run these two commands from the wildfly-ee11-tck-runner root:
+
+`mvn -Pstaging surefire:test@smoketest-javatest`
+`mvn -Pstaging surefire:test@smoketest-appclient`
+
+The first validates a basic ejb32 test using the javatest arquillian protocol. The second validates an appclient talking to a basic ejb32 using the appclient arquillian protocol.
+
+
 
 ## Running the Tests
 
