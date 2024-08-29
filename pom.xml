@@ -384,7 +384,7 @@
                         <configuration>
                             <dependenciesToScan>jakarta.tck:ejb32</dependenciesToScan>
                             <skip>false</skip>
-                            <groups>tck-appclient</groups>
+                            <groups>tck-javatest</groups>
                             <includes>
                                 <!-- Examples of single tests -->
                                 <include>com.sun.ts.tests.ejb32.lite.timer.basic.sharing.ClientEjbliteservletTest</include>
