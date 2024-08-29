@@ -42,7 +42,7 @@
         <version.jakarta.inject>2.0.1</version.jakarta.inject>
         <version.jakarta.servlet>5.0.0</version.jakarta.servlet>
         <version.jakarta.tck>11.0.0-SNAPSHOT</version.jakarta.tck>
-        <version.jakarta.tck.arquillian>1.0.0-SNAPSHOT</version.jakarta.tck.arquillian>
+        <version.jakarta.tck.arquillian>1.0.0-M12</version.jakarta.tck.arquillian>
         <version.org.wildfly.checkstyle-config>1.0.8.Final</version.org.wildfly.checkstyle-config>
         <!-- TCK properties -->
         <ts.home>${env.TS_HOME}</ts.home>

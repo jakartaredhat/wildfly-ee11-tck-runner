@@ -1,10 +1,25 @@
 # WildFly EE 11 TCK test runner
 An example WildFly runner for the ported EE 11 TCK tests.
 
+## Setup
+
+The runner needs the following dependencies. These will be installed by the setup.sh script run in the next section.
+
+* Jakarta EE 11 TCK build, https://github.com/jakartaee/platform-tck.git.
+* The jakartaee-tck-tools, https://github.com/eclipse-ee4j/jakartaee-tck-tools.git. This alternates between the latest staged version and a local snapshot build depending on if we are working on fixes to the arquillian protocols. Currently the version.jakarta.tck.arquillian is set to 1.0.0-M12.
+* The EE10 TCK cts-10-mods repo, https://gitlab.cee.redhat.com/j2eects/cts-10-mods.git. This requires VPN access to download, but not to use.
+* https://gitlab.cee.redhat.com/j2eects/scripts.git. Also requires VPN to clone, but not run.
+
+### TCK ENV Setup
+Run the setup.sh script from the root of the wildfly-ee11-tck-runner repo on a host with a Red Hat VPN connection.
+
+## Running the Tests
+
 So far, there are example runners for:
-- ejb30
-- ejb32
-- jpa
+* ejb30
+* ejb32
+* jms
+* jpa
 
 Each tck module has its own execution section with the id set to the module name. To run a single test module, use `mvn surefire:test@<module-name>`. For example, to run the JPA tests, use:
 
