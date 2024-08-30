@@ -49,4 +49,4 @@ bash $wildflytckroot/scripts/tck10.sh 2>&1 | tee tck10.log
 echo "Installing the standalone-full.xml configuration and tsharness.jar override"
 wfdir=`ls -d $wildflytckroot/wildfly/dist/target/wildfly*`
 cp $runnerDir/src/test/resources/standalone-full.xml $wfdir/standalone/configuration/
-cp lib/tsharness.jar $wfdir/modules/system/layers/base/com/sun/ts/main
+cp $runnerDir/lib/tsharness.jar $wfdir/modules/system/layers/base/com/sun/ts/main
