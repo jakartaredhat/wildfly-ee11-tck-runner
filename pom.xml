@@ -24,7 +24,7 @@
         <version.jakarta.inject>2.0.1</version.jakarta.inject>
         <version.jakarta.servlet>5.0.0</version.jakarta.servlet>
         <version.jakarta.tck>11.0.0-SNAPSHOT</version.jakarta.tck>
-        <version.jakarta.tck.arquillian>1.0.0-M13</version.jakarta.tck.arquillian>
+        <version.jakarta.tck.arquillian>1.0.0-SNAPSHOT</version.jakarta.tck.arquillian>
         <version.org.wildfly.checkstyle-config>1.0.8.Final</version.org.wildfly.checkstyle-config>
         <!-- These two environment variables need to be set -->
         <ts.home>${env.TS_HOME}</ts.home>
@@ -435,6 +435,40 @@
                         </configuration>
                     </execution>
 
+                    <!-- connector tests -->
+                    <execution>
+                        <id>connector</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <dependenciesToScan>jakarta.tck:connector</dependenciesToScan>
+                            <skip>false</skip>
+                            <groups>tck-javatest</groups>
+                            <includes>
+                                <!-- All tests -->
+                                <!--include>com/sun/ts/tests/connector/**/*Test.java</include-->
+                                <!-- Examples of single tests -->
+                                <include>com.sun.ts.tests.connector.localTx.connection.connectionClient1ServletTest</include>
+                            </includes>
+                            <properties>
+                                <configurationParameters>
+                                    junit.jupiter.extensions.autodetection.enabled = true
+                                    junit.platform.output.capture.stderr = true
+                                    junit.platform.output.capture.stdout = true
+                                    junit.platform.reporting.open.xml.enabled = true
+                                    junit.platform.reporting.output.dir = target/junit5-reports
+                                </configurationParameters>
+                            </properties>
+                            <systemPropertyVariables>
+                                <jboss.modules.system.pkgs>com.sun.ts.lib,com.sun.ts</jboss.modules.system.pkgs>
+                                <arquillian.xml>javatest-arquillian.xml</arquillian.xml>
+                                <ts.home>${ts.home}</ts.home>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+
                     <!-- The ejb30 tests -->
                     <execution>
                         <id>ejb30</id>
@@ -652,7 +686,7 @@
                                 <!-- All tests -->
                                 <!--include>ee/jakarta/tck/persistence/**/*Test.java</include-->
                                 <!-- Examples of single tests -->
-                                <include>ee.jakarta.tck.persistence.core.basic.ClientPmservletTest</include>
+                                <include>ee.jakarta.tck.persistence.core.EntityGraph.ClientPuservletTest</include>
                             </includes>
                             <properties>
                                 <configurationParameters>

@@ -26,10 +26,6 @@ wildfly-configuration:
       value: '../standalone/configuration/security/cts-roles.properties'
     users.properties:
       value: '../standalone/configuration/security/cts-users.properties'
-    vendor.jakarta.security.jacc.PolicyConfigurationFactory.provider:
-      value: 'org.wildfly.security.authz.jacc.ElytronPolicyConfigurationFactory'
-    vendor.jakarta.security.jacc.policy.provider:
-      value: 'org.wildfly.security.authz.jacc.JaccDelegatingPolicy'
     iiop-openjdk.interop.sun:
       value: 'on'
     ri.log.file.location:

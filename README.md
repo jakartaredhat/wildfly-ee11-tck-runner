@@ -6,7 +6,7 @@ An example WildFly runner for the ported EE 11 TCK tests.
 The runner needs the following dependencies. These will be installed by the setup.sh script run in the next section.
 
 * Jakarta EE 11 TCK build, https://github.com/jakartaee/platform-tck.git.
-* The jakartaee-tck-tools, https://github.com/eclipse-ee4j/jakartaee-tck-tools.git. This alternates between the latest staged version and a local snapshot build depending on if we are working on fixes to the arquillian protocols. Currently the version.jakarta.tck.arquillian is set to 1.0.0-M13.
+* The jakartaee-tck-tools, https://github.com/eclipse-ee4j/jakartaee-tck-tools.git. This alternates between the latest staged version and a local snapshot build depending on if we are working on fixes to the arquillian protocols. Currently the version.jakarta.tck.arquillian is set to 1.0.0-SNAPSHOT.
 * The EE10 TCK cts-10-mods repo, https://gitlab.cee.redhat.com/j2eects/cts-10-mods.git. This requires VPN access to download, but not to use.
 * https://gitlab.cee.redhat.com/j2eects/scripts.git. Also requires VPN to clone, but not run.
 

@@ -22,13 +22,14 @@
         <property name="deploymentExportPath">target/deployments</property>
     </engine>
     <extension qualifier="jboss-descriptors">
-        <property name="descriptorDir">/home/starksm/Dev/Jakarta/wildflytck-new/cts-10-mods/output/classes</property>
+        <property name="descriptorDir">${ts.home}/../cts-10-mods/output/classes</property>
     </extension>
 
     <container qualifier="tck-javatest" default="true">
         <configuration>
             <property name="jbossHome">${jboss.home}</property>
-            <property name="jbossArguments">-y=target/test-classes/wildfly-tck-min.yml -y=target/test-classes/derby.yml</property>
+            <property name="jbossArguments">-y=${project.build.directory}/test-classes/wildfly-tck-min.yml -y=${project.build.directory}/test-classes/derby.yml</property>
+            <!--property name="javaVmArguments">-Djboss.modules.system.pkgs=com.sun.ts.lib,com.sun.ts</property-->
             <property name="javaVmArguments"><!-- -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=y --></property>
             <property name="serverConfig">${wildfly.standalone.config}</property>
             <property name="allowConnectingToRunningServer">true</property>
