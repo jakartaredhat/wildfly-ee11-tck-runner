@@ -21,11 +21,6 @@ import tck.arquillian.protocol.common.TargetVehicle;
 
 
 @ExtendWith(ArquillianExtension.class)
-@Tag("persistence")
-@Tag("platform")
-@Tag("web")
-@Tag("tck-javatest")
-
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class Client1PmservletTest extends Client1 {
     static final String VEHICLE_ARCHIVE = "jpa_core_StoredProcedureQuery_pmservlet_vehicle";
