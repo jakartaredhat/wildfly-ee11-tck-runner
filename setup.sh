@@ -46,7 +46,8 @@ echo "Running the tck10.sh script with dummy testFolder to init the environment"
 export testFolder=/dev/null
 bash $wildflytckroot/scripts/tck10.sh 2>&1 | tee tck10.log
 
-echo "Installing the standalone-full.xml configuration and tsharness.jar override"
+echo "Installing the standalone-full.xml configuration and tsharness.jar, com.sun.ts module overrides"
 wfdir=`ls -d $wildflytckroot/wildfly/dist/target/wildfly*`
 cp $runnerDir/src/test/resources/standalone-full.xml $wfdir/standalone/configuration/
 cp $runnerDir/lib/tsharness.jar $wfdir/modules/system/layers/base/com/sun/ts/main
+cp $runnerDir/modules/com.sun.ts-module.xml $wfdir/modules/system/layers/base/com/sun/ts/main/module.xml

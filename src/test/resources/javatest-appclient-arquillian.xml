@@ -31,7 +31,7 @@
             <property name="jbossArguments"><!-- -y=target/test-classes/wildfly-tck-min.yml -y=target/test-classes/derby.yml --></property>
             <property name="javaVmArguments"><!-- -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=y --></property>
             <property name="serverConfig">${wildfly.standalone.config}</property>
-            <property name="allowConnectingToRunningServer">false</property>
+            <property name="allowConnectingToRunningServer">true</property>
         </configuration>
         <protocol type="appclient">
             <property name="runClient">true</property>

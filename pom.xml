@@ -437,6 +437,38 @@
 
                     <!-- connector tests -->
                     <execution>
+                        <id>connector-appclient</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <dependenciesToScan>jakarta.tck:connector</dependenciesToScan>
+                            <skip>false</skip>
+                            <groups>tck-appclient</groups>
+                            <includes>
+                                <!-- All tests -->
+                                <!--include>com/sun/ts/tests/connector/**/*Test.java</include-->
+                                <!-- Examples of single tests -->
+                                <include>com.sun.ts.tests.connector.localTx.connection.*Test</include>
+                            </includes>
+                            <properties>
+                                <configurationParameters>
+                                    junit.jupiter.extensions.autodetection.enabled = true
+                                    junit.platform.output.capture.stderr = true
+                                    junit.platform.output.capture.stdout = true
+                                    junit.platform.reporting.open.xml.enabled = true
+                                    junit.platform.reporting.output.dir = target/junit5-reports
+                                </configurationParameters>
+                            </properties>
+                            <systemPropertyVariables>
+                                <jboss.modules.system.pkgs>com.sun.ts.lib,com.sun.ts</jboss.modules.system.pkgs>
+                                <arquillian.xml>javatest-appclient-arquillian.xml</arquillian.xml>
+                                <ts.home>${ts.home}</ts.home>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>connector</id>
                         <phase>test</phase>
                         <goals>
@@ -450,7 +482,7 @@
                                 <!-- All tests -->
                                 <!--include>com/sun/ts/tests/connector/**/*Test.java</include-->
                                 <!-- Examples of single tests -->
-                                <include>com.sun.ts.tests.connector.localTx.connection.connectionClient1ServletTest</include>
+                                <include>com.sun.ts.tests.connector.localTx.connection.*Test</include>
                             </includes>
                             <properties>
                                 <configurationParameters>
