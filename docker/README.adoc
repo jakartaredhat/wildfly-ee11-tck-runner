@@ -1,0 +1,61 @@
+= Running the Jakarta EE 11 TCK with Docker
+
+For ease of testing you can run the TCK in a docker container. This setups a TCK environment for you and allows you execute the tests you'd like without blocking you from running other containers locally.
+
+== Getting Started
+
+=== Creating the Image
+
+The first time you execute this you need to build the image first. You can do this simply with:
+
+----
+./build.sh
+----
+
+This will build the image and take a while. The build clones the TCK repositories required and takes a while to clone these.
+
+IMPORTANT: Unless you've made changes to the `Dockerfile` or you've pulled down changes you should only need to execute this once.
+
+
+=== Creating and Running the Container
+
+After you create the image you simply need to execute:
+
+----
+./start.sh /path/to/wildfly.zip
+----
+
+The `start.sh` scripts expects one argument which is a path to a ZIP of the container you want to test.
+
+CAUTION: This **MUST** be a build which contains the JAR files. A thin server will not work as the TCK copies some JAR files from the container.
+
+=== Container Started
+
+Once the container is running you need to determine the version of Java you want to execute tests with. The current default is Java 11.
+You can easily set the version with the `javaenv` or `javahome` command. Simply pass the version of Java you want to use. The following
+are a list of the current installed versions:
+
+- 17
+- 21
+
+.Example
+----
+javaenv 17
+----
+
+You can also choose to start the container with Java 17 as the default. To do this you can pass the arguments to the `start.sh`
+script.
+
+----
+./start.sh /path/to/wildfl.zip tck-init.sh -j 17 /bin/bash
+----
+
+The `tck-init.sh -j 17` initializes your environment with JDK 17 and the TCK. The `/bin/bash` starts an interactive bash shell.
+
+=== Debugging
+
+You can enable debugging with port mapping. Pass the port arguments to the `DOCKER_ARGS` environment variable.
+
+----
+DOCKER_ARGS="-p 5005:5005 -p 8080:8080 -p 9990:9990" ./start.sh /path/to/wildfl.zip tck-init.sh
+----

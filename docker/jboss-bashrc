@@ -1,0 +1,41 @@
+# .bashrc
+
+javaenv() {
+    source javaenv.sh "$@"
+}
+javahome() {
+    source javaenv.sh "$@"
+}
+
+DEFAULT_PATH="${PATH}"
+export DEFAULT_PATH
+
+# Customize the command prompt
+GIT_COMPLETION_PATH="/usr/share/git-core/contrib/completion/git-prompt.sh"  
+if [ -f "$GIT_COMPLETION_PATH" ]; then  
+   GIT_PS1_SHOWDIRTYSTATE=true  
+   source "$GIT_COMPLETION_PATH"  
+   ADD_PS1='$(__git_ps1)'  
+fi  
+  
+PS1="\u@\h \w\[\e[33m\]$ADD_PS1\[\e[00m\] \$ "
+export PS1
+
+# Aliases
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias grep='grep --color=auto'
+alias ll="ls -l --color=auto"
+alias ls='ls --color=auto'
+alias xzegrep='xzegrep --color=auto'
+alias xzfgrep='xzfgrep --color=auto'
+alias xzgrep='xzgrep --color=auto'
+alias zegrep='zegrep --color=auto'
+alias zfgrep='zfgrep --color=auto'
+alias zgrep='zgrep --color=auto'
+
+# Export functions
+export -f javaenv
+
+# Enable bash completion
+. /etc/profile.d/bash_completion.sh

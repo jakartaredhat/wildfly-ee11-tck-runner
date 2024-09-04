@@ -23,7 +23,7 @@
         <!-- This is similar to what one would provide for the modifications found in the command.testExecuteAppClient
         of the ts.jte file in the EE10 TCK. The appclient protocol parses this into a String[] by using ';' as
         the command line argument value separator. -->
-        <property name="clientCmdLineString">${jboss.home}/bin/appclient.sh;target/appclient/ejb3_bb_stateless_basic.ear#ejb3_bb_stateless_basic_client.jar;-p;/home/starksm/Dev/Jakarta/wildflytck/jakartaeetck/bin/xml/../../tmp/tstest.jte</property>
+        <property name="clientCmdLineString">${jboss.home}/bin/appclient.sh;target/appclient/ejb3_bb_stateless_basic.ear#ejb3_bb_stateless_basic_client.jar;-p;${ts.home}/bin/xml/../../tmp/tstest.jte</property>
         <!-- Provide any environment variable settings needed by the appclient runner.
         The appclient protocol parses this into a String[] by using ';' as
         the environment variable value pair separator. The pattern is env1=value1;env2=value2;... -->
