@@ -7,8 +7,8 @@ The runner needs the following dependencies. These will be installed by the setu
 
 * Jakarta EE 11 TCK build, https://github.com/jakartaee/platform-tck.git.
 * The jakartaee-tck-tools, https://github.com/eclipse-ee4j/jakartaee-tck-tools.git. This alternates between the latest staged version and a local snapshot build depending on if we are working on fixes to the arquillian protocols. Currently the version.jakarta.tck.arquillian is set to 1.0.0-SNAPSHOT.
-* The EE10 TCK cts-10-mods repo, https://gitlab.cee.redhat.com/j2eects/cts-10-mods.git. This requires VPN access to download, but not to use.
-* https://gitlab.cee.redhat.com/j2eects/scripts.git. Also requires VPN to clone, but not run.
+* The EE10 TCK cts-10-mods requires VPN access to download not to use.
+* The EE10 TCK scripts also requires VPN to clone, but not run.
 
 ### TCK ENV Setup
 Run the setup.sh script from the root of the wildfly-ee11-tck-runner repo on a host with a Red Hat VPN connection. The script does the following:
