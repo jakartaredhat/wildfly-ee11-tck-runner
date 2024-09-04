@@ -44,7 +44,7 @@ wildfly-configuration:
         default:
           auto-deploy-zipped: false
     ee:
-      global-modules:
+      global-modules: !list-add
         - name: com.sun.ts
           slot: main
     ejb3:
