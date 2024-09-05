@@ -369,7 +369,6 @@
                 <version>3.3.1</version>
                 <configuration>
                     <skip>true</skip>
-                    <failIfNoSpecifiedTests>true</failIfNoSpecifiedTests>
                     <includes>
                         <include>**/*Test.java</include>
                         <include>**/*TestCase.java</include>
