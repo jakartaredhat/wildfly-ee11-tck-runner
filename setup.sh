@@ -36,10 +36,10 @@ fi
 
 cd $wildflytckroot
 if [ -d "scripts" ]; then
-  echo "scripts directory already exists, skipping clone"
+  echo "scripts directory already exists"
 else
-  echo "cloning the JBoss CTS scripts repository, needs VPN access"
-  git clone https://gitlab.cee.redhat.com/j2eects/scripts.git
+  echo "JBoss CTS scripts repository, needs VPN access to download in order to setup the TCK environment"
+  exit 1
 fi
 
 echo "Running the tck10.sh script with dummy testFolder to init the environment"
