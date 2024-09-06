@@ -143,6 +143,8 @@ wildfly-configuration:
           slot: main
         - name: org.apache.derby.embedded
           slot: main
+        - name: com.sun.ts
+          slot: main
       service:
         default-bindings:
           datasource: 'java:/jdbc/DB1'

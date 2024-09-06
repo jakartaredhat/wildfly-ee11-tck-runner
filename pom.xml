@@ -33,6 +33,10 @@
         <!-- Other properties -->
         <wildfly.standalone.config>standalone-full.xml</wildfly.standalone.config>
 
+        <!-- TCK Paths -->
+        <tck.jte.path>${ts.home}/bin/xml/../../tmp/tstest.jte</tck.jte.path>
+        <tck.descriptor.path>${ts.home}/../cts-10-mods/output/classes</tck.descriptor.path>
+
         <maven.test.skip>false</maven.test.skip>
         <skipTests>${maven.test.skip}</skipTests>
 
@@ -365,7 +369,6 @@
                 <version>3.3.1</version>
                 <configuration>
                     <skip>true</skip>
-                    <failIfNoSpecifiedTests>true</failIfNoSpecifiedTests>
                     <includes>
                         <include>**/*Test.java</include>
                         <include>**/*TestCase.java</include>
