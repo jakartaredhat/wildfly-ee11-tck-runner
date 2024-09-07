@@ -37,7 +37,7 @@
             <property name="runClient">true</property>
             <property name="runAsVehicle">true</property>
             <property name="clientEarDir">target/appclient</property>
-            <property name="clientCmdLineString">${jboss.home}/bin/appclient.sh;-y;${project.build.testOutputDirectory}/appclient.yml;-y;${project.build.testOutputDirectory}/derby.yml;${clientEarDir}/${vehicleArchiveName}.ear#${vehicleArchiveName}_client.jar</property>
+            <property name="clientCmdLineString">${jboss.home}/bin/appclient.sh;-y=${project.build.testOutputDirectory}/appclient.yml:${project.build.testOutputDirectory}/derby.yml;${clientEarDir}/${vehicleArchiveName}.ear#${vehicleArchiveName}_client.jar</property>
             <property name="clientEnvString">MY_EN=my-env-stting</property>
             <property name="clientDir">${project.basedir}</property>
             <property name="workDir">${ts.home}/tmp</property>
