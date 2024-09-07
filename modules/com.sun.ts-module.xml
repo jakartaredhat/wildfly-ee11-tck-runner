@@ -8,6 +8,7 @@
         <resource-root path="jboss-porting.jar"/>
         <resource-root path="tsharness.jar"/>
         <resource-root path="whitebox.jar"/>
+        <resource-root path="common.jar"/>
     </resources>
 
     <dependencies>
