@@ -386,6 +386,25 @@
                             <outputDirectory>${jboss.home}/modules/system/layers/base/com/sun/ts/main/</outputDirectory>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>copy-tsharness-lib-to-module</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>jakarta.tck</groupId>
+                                    <artifactId>tsharness</artifactId>
+                                    <version>${version.jakarta.tck}</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <stripVersion>true</stripVersion>
+                            <outputDirectory>${jboss.home}/modules/system/layers/base/com/sun/ts/main/</outputDirectory>
+                        </configuration>
+                    </execution>
+
                 </executions>
             </plugin>
             <plugin>
