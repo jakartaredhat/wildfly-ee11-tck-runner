@@ -361,6 +361,26 @@
                         <nonFilteredFileExtension>keystore</nonFilteredFileExtension>
                     </nonFilteredFileExtensions>
                 </configuration>
+                <executions>
+                     <execution>
+                         <id>add_platformtck_module</id>
+                         <phase>generate-sources</phase>
+                         <goals>
+                             <goal>copy-resources</goal>
+                         </goals>
+                         <configuration>
+                             <outputDirectory>${jboss.home}/modules/system/layers/base/tck/platformtckclasses/main</outputDirectory>
+                             <resources>
+                                 <resource>
+                                     <directory>source-files</directory>
+                                     <includes>
+                                         <include>test/resources/tsharness/module.xml</include>
+                                     </includes>
+                                 </resource>
+                             </resources>
+                         </configuration>
+                     </execution>
+                 </executions>
             </plugin>
 
             <!-- Temporary hack to include the common TCK library in com.sun.ts module -->
@@ -383,9 +403,28 @@
                                 </artifactItem>
                             </artifactItems>
                             <stripVersion>true</stripVersion>
-                            <outputDirectory>${jboss.home}/modules/system/layers/base/com/sun/ts/main/</outputDirectory>
+                            <outputDirectory>${jboss.home}/modules/system/layers/base/tck/platformtckclasses/main</outputDirectory>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>copy-tsharness-lib-to-module</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>jakarta.tck</groupId>
+                                    <artifactId>tsharness</artifactId>
+                                    <version>${version.jakarta.tck}</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <stripVersion>true</stripVersion>
+                            <outputDirectory>${jboss.home}/modules/system/layers/base/tck/platformtckclasses/main/</outputDirectory>
+                        </configuration>
+                    </execution>
+
                 </executions>
             </plugin>
             <plugin>
@@ -490,7 +529,7 @@
                                 </configurationParameters>
                             </properties>
                             <systemPropertyVariables>
-                                <jboss.modules.system.pkgs>com.sun.ts.lib,com.sun.ts</jboss.modules.system.pkgs>
+                                <jboss.modules.system.pkgs>com.sun.ts.lib,com.sun.ts,tck.platformtckclasses</jboss.modules.system.pkgs>
                                 <arquillian.xml>javatest-appclient-arquillian.xml</arquillian.xml>
                                 <ts.home>${ts.home}</ts.home>
                             </systemPropertyVariables>
@@ -522,7 +561,7 @@
                                 </configurationParameters>
                             </properties>
                             <systemPropertyVariables>
-                                <jboss.modules.system.pkgs>com.sun.ts.lib,com.sun.ts</jboss.modules.system.pkgs>
+                                <jboss.modules.system.pkgs>com.sun.ts.lib,com.sun.ts,tck.platformtckclasses</jboss.modules.system.pkgs>
                                 <arquillian.xml>javatest-arquillian.xml</arquillian.xml>
                                 <ts.home>${ts.home}</ts.home>
                             </systemPropertyVariables>
@@ -626,6 +665,7 @@
                                 </configurationParameters>
                             </properties>
                             <systemPropertyVariables>
+                                <jboss.modules.system.pkgs>com.sun.ts.lib,com.sun.ts,tck.platformtckclasses</jboss.modules.system.pkgs>
                                 <arquillian.xml>javatest-arquillian.xml</arquillian.xml>
                                 <ts.home>${ts.home}</ts.home>
                             </systemPropertyVariables>
