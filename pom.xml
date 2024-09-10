@@ -529,7 +529,7 @@
                                 </configurationParameters>
                             </properties>
                             <systemPropertyVariables>
-                                <jboss.modules.system.pkgs>com.sun.ts.lib,com.sun.ts</jboss.modules.system.pkgs>
+                                <jboss.modules.system.pkgs>com.sun.ts.lib,com.sun.ts,tck.platformtckclasses</jboss.modules.system.pkgs>
                                 <arquillian.xml>javatest-appclient-arquillian.xml</arquillian.xml>
                                 <ts.home>${ts.home}</ts.home>
                             </systemPropertyVariables>
@@ -561,7 +561,7 @@
                                 </configurationParameters>
                             </properties>
                             <systemPropertyVariables>
-                                <jboss.modules.system.pkgs>com.sun.ts.lib,com.sun.ts</jboss.modules.system.pkgs>
+                                <jboss.modules.system.pkgs>com.sun.ts.lib,com.sun.ts,tck.platformtckclasses</jboss.modules.system.pkgs>
                                 <arquillian.xml>javatest-arquillian.xml</arquillian.xml>
                                 <ts.home>${ts.home}</ts.home>
                             </systemPropertyVariables>
@@ -665,6 +665,7 @@
                                 </configurationParameters>
                             </properties>
                             <systemPropertyVariables>
+                                <jboss.modules.system.pkgs>com.sun.ts.lib,com.sun.ts,tck.platformtckclasses</jboss.modules.system.pkgs>
                                 <arquillian.xml>javatest-arquillian.xml</arquillian.xml>
                                 <ts.home>${ts.home}</ts.home>
                             </systemPropertyVariables>

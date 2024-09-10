@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- contains the Jakarta EE 11 Platform TCK TestUtil.class + EETest.class + whitebox connector classes -->
-<module xmlns="urn:jboss:module:1.0" name="platformtckclasses">
+<module xmlns="urn:jboss:module:1.0" name="tck.platformtckclasses">
     <resources>
        <resource-root path="tsharness.jar"/>
        <resource-root path="common.jar"/>
